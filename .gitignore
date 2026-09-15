@@ -1,0 +1,36 @@
+# .NET & C#
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# Node & Frontend
+**/node_modules/
+**/dist/
+**/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & SQLite
+**/*.db
+**/*.db-shm
+**/*.db-wal
+app_data.db
+
+# Tauri & Rust
+**/src-tauri/target/
+**/binaries/
+
+# Environment & Local
+.env
+.env.local
+.env.*.local
+
+# OS
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

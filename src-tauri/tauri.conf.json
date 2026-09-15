@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "build": {
+    "beforeDevCommand": "npm --prefix frontend run dev",
+    "beforeBuildCommand": "npm --prefix frontend run build",
+    "devPath": "http://localhost:5173",
+    "distDir": "../frontend/dist"
+  },
+  "package": {
+    "productName": "PayTrack",
+    "version": "1.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "sidecar": true,
+        "scope": [
+          { "name": "binaries/paytrack-api", "sidecar": true, "args": true }
+        ]
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.paytrack.desktop",
+      "icon": [],
+      "externalBin": [
+        "binaries/paytrack-api"
+      ]
+    },
+    "windows": [
+      {
+        "title": "PayTrack — Gestión de Proveedores y Pagos",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 960,
+        "minHeight": 650,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  }
+}
