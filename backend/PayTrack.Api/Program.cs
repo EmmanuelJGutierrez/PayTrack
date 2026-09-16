@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,9 @@ using PayTrack.Api.Common;
 using PayTrack.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Fijar puerto predeterminado a 5177 (compatible con el frontend y Tauri)
+builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://localhost:5177");
 
 // Configuración de base de datos SQLite
 string dbPath;

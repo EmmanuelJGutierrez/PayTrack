@@ -22,6 +22,7 @@ export const App: React.FC = () => {
   const [deudas, setDeudas] = useState<DeudaResumen[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   // Modales
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -42,6 +43,7 @@ export const App: React.FC = () => {
 
   const loadProveedores = useCallback(async () => {
     try {
+      setConnectionError(null);
       const data = await fetchProveedores(anio, mes, searchTerm);
       setProveedores(data);
 
@@ -58,6 +60,7 @@ export const App: React.FC = () => {
       }
     } catch (err) {
       console.error('Error al cargar proveedores:', err);
+      setConnectionError('No se pudo conectar con el servidor backend. Verificá que la API de .NET esté corriendo en http://localhost:5177');
     } finally {
       setLoading(false);
     }
@@ -118,6 +121,23 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Banner de error de conexión si el backend está caído */}
+      {connectionError && (
+        <div
+          style={{
+            backgroundColor: '#fee2e2',
+            color: '#b91c1c',
+            padding: '10px 24px',
+            textAlign: 'center',
+            fontSize: '14px',
+            fontWeight: 700,
+            borderBottom: '1.5px solid #f87171'
+          }}
+        >
+          ⚠️ {connectionError}
+        </div>
+      )}
+
       {/* Header Fijo */}
       <Header
         anio={anio}

@@ -7,7 +7,8 @@
   DetalleDiaResponse
 } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5177/api';
+// Usar proxy relativo /api (enrutado a http://localhost:5177 por Vite o Tauri)
+const API_BASE = '/api';
 
 export async function fetchHealth(): Promise<{ status: string }> {
   const res = await fetch(`${API_BASE}/health`);
