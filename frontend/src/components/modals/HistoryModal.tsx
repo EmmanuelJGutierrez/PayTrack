@@ -1,10 +1,11 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { ModalWrapper } from './ModalWrapper';
-import { fetchHistorial, anularPago } from '../../services/api';
+import { fetchHistorial, anularPago, restaurarDeuda } from '../../services/api';
 import type { MovimientoHistorial } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
 import { exportHistorialProveedorToCsv } from '../../utils/exporter';
-import { FileSpreadsheet, ArrowDownRight, ArrowUpRight, Trash2 } from 'lucide-react';
+import { FileSpreadsheet, ArrowDownRight, ArrowUpRight, Trash2, RotateCcw, FileText } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 interface Props {
   isOpen: boolean;
@@ -23,7 +24,11 @@ export const HistoryModal: React.FC<Props> = ({
 }) => {
   const [items, setItems] = useState<MovimientoHistorial[]>([]);
   const [loading, setLoading] = useState(false);
-  const [anulandoId, setAnulandoId] = useState<number | null>(null);
+
+  // Estados para modales de confirmación en la interfaz (sin alerts de navegador)
+  const [pagoToCancel, setPagoToCancel] = useState<MovimientoHistorial | null>(null);
+  const [deudaToRestore, setDeudaToRestore] = useState<MovimientoHistorial | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const loadData = () => {
     if (!proveedorId) return;
@@ -45,29 +50,40 @@ export const HistoryModal: React.FC<Props> = ({
     exportHistorialProveedorToCsv(proveedorNombre, items);
   };
 
-  const handleAnular = async (mov: MovimientoHistorial) => {
-    const fechaStr = new Date(mov.fecha).toLocaleDateString();
-    const confirmacion = window.confirm(
-      `¿Estás seguro de anular el pago de $${mov.monto.toLocaleString()} (${mov.medioPago || 'Pago'}, ${fechaStr})?\n\n` +
-      `El saldo de la deuda aumentará automáticamente por este monto.`
-    );
-
-    if (!confirmacion) return;
+  const confirmAnularPago = async () => {
+    if (!pagoToCancel) return;
 
     try {
-      setAnulandoId(mov.id);
-      await anularPago(mov.id);
+      setActionLoading(true);
+      await anularPago(pagoToCancel.id);
+      setPagoToCancel(null);
       loadData();
       if (onSuccess) onSuccess();
     } catch (err: any) {
       alert(err.message || 'Error al anular pago');
     } finally {
-      setAnulandoId(null);
+      setActionLoading(false);
+    }
+  };
+
+  const confirmRestaurarDeuda = async () => {
+    if (!deudaToRestore) return;
+
+    try {
+      setActionLoading(true);
+      await restaurarDeuda(proveedorId, deudaToRestore.id);
+      setDeudaToRestore(null);
+      loadData();
+      if (onSuccess) onSuccess();
+    } catch (err: any) {
+      alert(err.message || 'Error al restaurar deuda');
+    } finally {
+      setActionLoading(false);
     }
   };
 
   return (
-    <ModalWrapper isOpen={isOpen} onClose={onClose} title={`Historial — ${proveedorNombre}`} maxWidth="740px">
+    <ModalWrapper isOpen={isOpen} onClose={onClose} title={`Historial de Movimientos — ${proveedorNombre}`} maxWidth="780px">
       {/* Barra de Acciones Superior */}
       <div
         style={{
@@ -134,7 +150,7 @@ export const HistoryModal: React.FC<Props> = ({
           No hay movimientos registrados para este proveedor.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '460px', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '480px', overflowY: 'auto' }}>
           {items.map((mov, idx) => {
             const isDeuda = mov.tipoMovimiento === 'Deuda';
             const isPago = mov.tipoMovimiento === 'Pago';
@@ -151,10 +167,10 @@ export const HistoryModal: React.FC<Props> = ({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '12px',
-                  opacity: mov.activo ? 1 : 0.6
+                  opacity: mov.activo ? 1 : 0.65
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
                   <div
                     style={{
                       width: '36px',
@@ -171,7 +187,7 @@ export const HistoryModal: React.FC<Props> = ({
                     {isDeuda ? <ArrowDownRight size={20} /> : <ArrowUpRight size={20} />}
                   </div>
 
-                  <div style={{ minWidth: 0 }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span
                         style={{
@@ -183,9 +199,13 @@ export const HistoryModal: React.FC<Props> = ({
                       >
                         {mov.concepto}
                       </span>
+
+                      {/* Badge de comprobante si es deuda */}
                       {mov.tipoComprobante && (
                         <ComprobanteBadge tipo={mov.tipoComprobante} numero={mov.numeroComprobante} />
                       )}
+
+                      {/* Badge de forma de pago */}
                       {mov.medioPago && (
                         <span
                           style={{
@@ -200,6 +220,7 @@ export const HistoryModal: React.FC<Props> = ({
                           {mov.medioPago}
                         </span>
                       )}
+
                       {!mov.activo && (
                         <span
                           style={{
@@ -211,10 +232,24 @@ export const HistoryModal: React.FC<Props> = ({
                             borderRadius: '4px'
                           }}
                         >
-                          Anulado
+                          {isDeuda ? 'Deuda Eliminada' : 'Pago Anulado'}
                         </span>
                       )}
                     </div>
+
+                    {/* CONFIRMACIÓN DE A QUÉ DEUDA HACE REFERENCIA EL PAGO */}
+                    {isPago && (
+                      <div style={{ fontSize: '12px', color: '#4338ca', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <FileText size={12} />
+                        <span>
+                          <strong>Deuda aplicada:</strong>{' '}
+                          {mov.deudaConcepto ? mov.deudaConcepto : 'Pago a cuenta general del proveedor'}
+                        </span>
+                        {mov.deudaTipoComprobante && (
+                          <ComprobanteBadge tipo={mov.deudaTipoComprobante} numero={mov.deudaNumeroComprobante} />
+                        )}
+                      </div>
+                    )}
 
                     <span style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginTop: '2px' }}>
                       {new Date(mov.fecha).toLocaleDateString()} {new Date(mov.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -223,7 +258,7 @@ export const HistoryModal: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
                   <div style={{ textAlign: 'right' }}>
                     <span
                       style={{
@@ -240,8 +275,7 @@ export const HistoryModal: React.FC<Props> = ({
                   {/* Botón para anular pago activo */}
                   {isPago && mov.activo && (
                     <button
-                      onClick={() => handleAnular(mov)}
-                      disabled={anulandoId === mov.id}
+                      onClick={() => setPagoToCancel(mov)}
                       style={{
                         padding: '6px 10px',
                         borderRadius: '6px',
@@ -261,7 +295,34 @@ export const HistoryModal: React.FC<Props> = ({
                       title="Anular este pago (recalcula los saldos automáticamente)"
                     >
                       <Trash2 size={12} />
-                      <span>{anulandoId === mov.id ? 'Anulando...' : 'Anular'}</span>
+                      <span>Anular</span>
+                    </button>
+                  )}
+
+                  {/* Botón para RESTAURAR DEUDA eliminada */}
+                  {isDeuda && !mov.activo && (
+                    <button
+                      onClick={() => setDeudaToRestore(mov)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        backgroundColor: '#f0fdf4',
+                        border: '1px solid #86efac',
+                        color: '#15803d',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                      title="Restaurar esta deuda y traerla de vuelta a la lista activa"
+                    >
+                      <RotateCcw size={12} />
+                      <span>Restaurar Deuda</span>
                     </button>
                   )}
                 </div>
@@ -270,6 +331,59 @@ export const HistoryModal: React.FC<Props> = ({
           })}
         </div>
       )}
+
+      {/* Modal de confirmación en la interfaz para ANULAR PAGO */}
+      <ConfirmModal
+        isOpen={!!pagoToCancel}
+        onClose={() => setPagoToCancel(null)}
+        onConfirm={confirmAnularPago}
+        title="¿Anular este pago?"
+        message={
+          pagoToCancel && (
+            <div>
+              <p style={{ margin: '0 0 10px 0' }}>
+                ¿Estás seguro de anular el pago de <strong>${pagoToCancel.monto.toLocaleString()}</strong> ({pagoToCancel.medioPago || 'Pago'}) registrado el {new Date(pagoToCancel.fecha).toLocaleDateString()}?
+              </p>
+              {pagoToCancel.deudaConcepto && (
+                <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#4338ca' }}>
+                  Estaba imputado a la deuda: <strong>{pagoToCancel.deudaConcepto}</strong>
+                </p>
+              )}
+              <p style={{ margin: 0, color: '#b91c1c', fontWeight: 600 }}>
+                ⚠️ El saldo pendiente de la deuda aumentará automáticamente por este importe.
+              </p>
+            </div>
+          )
+        }
+        confirmText="Sí, Anular Pago"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={actionLoading}
+      />
+
+      {/* Modal de confirmación en la interfaz para RESTAURAR DEUDA */}
+      <ConfirmModal
+        isOpen={!!deudaToRestore}
+        onClose={() => setDeudaToRestore(null)}
+        onConfirm={confirmRestaurarDeuda}
+        title="¿Restaurar comprobante de deuda?"
+        message={
+          deudaToRestore && (
+            <div>
+              <p style={{ margin: '0 0 10px 0' }}>
+                Estás a punto de recuperar la deuda <strong>"{deudaToRestore.concepto}"</strong> por <strong>${deudaToRestore.monto.toLocaleString()}</strong>.
+              </p>
+              <p style={{ margin: 0, color: '#15803d', fontWeight: 600 }}>
+                ✓ Volverá a aparecer en la lista de deudas activas y su saldo adeudado se reintegrará al total del proveedor.
+              </p>
+            </div>
+          )
+        }
+        confirmText="Sí, Restaurar Deuda"
+        cancelText="Cancelar"
+        variant="success"
+        loading={actionLoading}
+      />
     </ModalWrapper>
   );
 };

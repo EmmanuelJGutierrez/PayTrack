@@ -15,6 +15,7 @@ import {
 import type { ProveedorResumen, DeudaResumen } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
 import { eliminarDeuda } from '../../services/api';
+import { ConfirmModal } from '../modals/ConfirmModal';
 
 interface Props {
   proveedor: ProveedorResumen;
@@ -34,27 +35,25 @@ export const DebtTable: React.FC<Props> = ({
   onDebtDeleted
 }) => {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deudaToDelete, setDeudaToDelete] = useState<DeudaResumen | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const toggleRow = (id: number) => {
     setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleDelete = async (deuda: DeudaResumen) => {
-    const confirmMsg = deuda.totalPagado > 0
-      ? `Esta deuda tiene $${deuda.totalPagado.toLocaleString()} amortizados. ¿Estás seguro de que deseás eliminarla?`
-      : `¿Estás seguro de eliminar la deuda "${deuda.concepto}" por $${deuda.monto.toLocaleString()}?`;
-
-    if (!window.confirm(confirmMsg)) return;
+  const confirmDelete = async () => {
+    if (!deudaToDelete) return;
 
     try {
-      setDeletingId(deuda.id);
-      await eliminarDeuda(proveedor.id, deuda.id);
+      setDeleting(true);
+      await eliminarDeuda(proveedor.id, deudaToDelete.id);
+      setDeudaToDelete(null);
       if (onDebtDeleted) onDebtDeleted();
     } catch (err: any) {
       alert(err.message || 'Error al eliminar la deuda');
     } finally {
-      setDeletingId(null);
+      setDeleting(false);
     }
   };
 
@@ -161,10 +160,10 @@ export const DebtTable: React.FC<Props> = ({
             {proveedor.nombre}
           </h1>
 
-          {/* Estadísticas en línea (Figma) */}
+          {/* Estadísticas en línea */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', fontSize: '14px', flexWrap: 'wrap' }}>
             <span style={{ color: '#4b5563', fontWeight: 600 }}>
-              Deudas: <strong style={{ color: '#111827' }}>{proveedor.cantidadDeudas}</strong>
+              Deudas activas: <strong style={{ color: '#111827' }}>{proveedor.cantidadDeudas}</strong>
             </span>
 
             <span style={{ color: '#4b5563', fontWeight: 600 }}>
@@ -219,26 +218,29 @@ export const DebtTable: React.FC<Props> = ({
 
         {/* Botones de acción del proveedor */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Botón Historial en su propio lugar destacado */}
           <button
-            onClick={() => onOpenAddPayment()}
-            disabled={proveedor.saldoPendiente <= 0}
+            onClick={onOpenHistory}
             style={{
               padding: '10px 18px',
               borderRadius: '10px',
-              backgroundColor: proveedor.saldoPendiente > 0 ? '#16a34a' : '#e5e7eb',
-              color: '#ffffff',
+              backgroundColor: '#fef3c7',
+              color: '#92400e',
+              border: '1.5px solid #fde68a',
               fontWeight: 700,
               fontSize: '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              border: 'none',
-              cursor: proveedor.saldoPendiente > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: proveedor.saldoPendiente > 0 ? '0 2px 4px rgba(22, 163, 74, 0.25)' : 'none'
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
             }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#fde68a')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#fef3c7')}
+            title="Ver todos los movimientos (deudas y pagos) de este proveedor"
           >
-            <DollarSign size={16} />
-            <span>Pagar Saldo</span>
+            <History size={17} />
+            <span>Historial de Movimientos</span>
           </button>
 
           <button
@@ -246,24 +248,25 @@ export const DebtTable: React.FC<Props> = ({
             style={{
               padding: '10px 18px',
               borderRadius: '10px',
-              backgroundColor: '#1f2937',
+              backgroundColor: '#111827',
               color: '#ffffff',
               fontWeight: 700,
               fontSize: '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
           >
-            <Plus size={16} />
+            <Plus size={17} />
             <span>+ Cargar Deuda</span>
           </button>
         </div>
       </div>
 
-      {/* Tabla / Card con estilo idéntico al Figma */}
+      {/* Tabla / Card con estilo limpio y espacioso */}
       <div
         style={{
           backgroundColor: '#ffffff',
@@ -273,11 +276,11 @@ export const DebtTable: React.FC<Props> = ({
           boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
         }}
       >
-        {/* Encabezado de la tabla */}
+        {/* Encabezado de la tabla (5 columnas limpias) */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '2.6fr 1.2fr 1.2fr 1fr 1fr 1fr',
+            gridTemplateColumns: '3fr 1.2fr 1.2fr 1fr 1fr',
             padding: '16px 24px',
             backgroundColor: '#f1ede7',
             fontWeight: 800,
@@ -287,12 +290,11 @@ export const DebtTable: React.FC<Props> = ({
             letterSpacing: '0.5px'
           }}
         >
-          <div>Concepto / Estado</div>
+          <div>Concepto / Comprobante</div>
           <div style={{ textAlign: 'center' }}>Total Deuda</div>
           <div style={{ textAlign: 'center' }}>Saldo Pendiente</div>
           <div style={{ textAlign: 'center' }}>Agregar Pago</div>
-          <div style={{ textAlign: 'center' }}>Historial</div>
-          <div style={{ textAlign: 'center' }}>Este Mes</div>
+          <div style={{ textAlign: 'center' }}>Pagado Este Mes</div>
         </div>
 
         {/* Listado de Deudas */}
@@ -321,7 +323,7 @@ export const DebtTable: React.FC<Props> = ({
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '2.6fr 1.2fr 1.2fr 1fr 1fr 1fr',
+                    gridTemplateColumns: '3fr 1.2fr 1.2fr 1fr 1fr',
                     padding: '18px 24px',
                     alignItems: 'center',
                     gap: '12px'
@@ -349,7 +351,7 @@ export const DebtTable: React.FC<Props> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', paddingLeft: '24px' }}>
                       <div
                         style={{
-                          width: '110px',
+                          width: '120px',
                           height: '6px',
                           backgroundColor: '#e5e7eb',
                           borderRadius: '4px',
@@ -398,8 +400,8 @@ export const DebtTable: React.FC<Props> = ({
                       onClick={() => onOpenAddPayment(d)}
                       disabled={isSaldado}
                       style={{
-                        width: '36px',
-                        height: '36px',
+                        width: '38px',
+                        height: '38px',
                         borderRadius: '50%',
                         backgroundColor: isSaldado ? '#f3f4f6' : '#eff6ff',
                         color: isSaldado ? '#9ca3af' : '#2563eb',
@@ -408,37 +410,16 @@ export const DebtTable: React.FC<Props> = ({
                         alignItems: 'center',
                         justifyContent: 'center',
                         cursor: isSaldado ? 'not-allowed' : 'pointer',
-                        boxShadow: isSaldado ? 'none' : '0 1px 2px rgba(0,0,0,0.05)'
+                        boxShadow: isSaldado ? 'none' : '0 1px 3px rgba(37, 99, 235, 0.15)',
+                        transition: 'transform 0.1s ease'
                       }}
-                      title={isSaldado ? 'Deuda totalmente saldada' : 'Registrar pago a esta deuda'}
+                      title={isSaldado ? 'Deuda totalmente saldada' : `Pagar sobre deuda: ${d.concepto}`}
                     >
-                      <Plus size={18} />
+                      <Plus size={19} />
                     </button>
                   </div>
 
-                  {/* Columna 5: Botón Historial */}
-                  <div style={{ textAlign: 'center' }}>
-                    <button
-                      onClick={onOpenHistory}
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        backgroundColor: '#fef3c7',
-                        color: '#b45309',
-                        border: '1px solid #fde68a',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer'
-                      }}
-                      title="Ver historial de pagos de este proveedor"
-                    >
-                      <History size={16} />
-                    </button>
-                  </div>
-
-                  {/* Columna 6: Este Mes */}
+                  {/* Columna 5: Pagado Este Mes */}
                   <div style={{ textAlign: 'center' }}>
                     {d.pagadoEsteMes > 0 ? (
                       <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -517,8 +498,7 @@ export const DebtTable: React.FC<Props> = ({
                     </div>
 
                     <button
-                      onClick={() => handleDelete(d)}
-                      disabled={deletingId === d.id}
+                      onClick={() => setDeudaToDelete(d)}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -535,7 +515,7 @@ export const DebtTable: React.FC<Props> = ({
                       title="Eliminar este comprobante"
                     >
                       <Trash2 size={13} />
-                      <span>{deletingId === d.id ? 'Eliminando...' : 'Eliminar Deuda'}</span>
+                      <span>Eliminar Deuda</span>
                     </button>
                   </div>
                 )}
@@ -544,6 +524,35 @@ export const DebtTable: React.FC<Props> = ({
           })
         )}
       </div>
+
+      {/* Modal de confirmación en interfaz para eliminar deuda (sin alert de navegador) */}
+      <ConfirmModal
+        isOpen={!!deudaToDelete}
+        onClose={() => setDeudaToDelete(null)}
+        onConfirm={confirmDelete}
+        title="¿Eliminar comprobante de deuda?"
+        message={
+          deudaToDelete && (
+            <div>
+              <p style={{ margin: '0 0 10px 0' }}>
+                Estás a punto de eliminar la deuda <strong>"{deudaToDelete.concepto}"</strong> por <strong>${deudaToDelete.monto.toLocaleString()}</strong>.
+              </p>
+              {deudaToDelete.totalPagado > 0 && (
+                <p style={{ color: '#b91c1c', fontWeight: 600, margin: '0 0 8px 0' }}>
+                  ⚠️ Esta deuda tiene pagos amortizados por ${deudaToDelete.totalPagado.toLocaleString()}.
+                </p>
+              )}
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Si la eliminás por error, podrás restaurarla en cualquier momento desde el <strong>Historial de Movimientos</strong>.
+              </p>
+            </div>
+          )
+        }
+        confirmText="Sí, Eliminar Deuda"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   );
 };

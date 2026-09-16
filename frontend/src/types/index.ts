@@ -69,6 +69,10 @@ export interface MovimientoHistorial {
   referencia?: string;
   fecha: string;
   activo: boolean;
+  deudaId?: number;
+  deudaConcepto?: string;
+  deudaTipoComprobante?: 'Remito' | 'Factura';
+  deudaNumeroComprobante?: string;
 }
 
 export interface DiaCalendario {

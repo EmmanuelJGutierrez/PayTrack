@@ -74,4 +74,28 @@ public class ProveedorTests : IClassFixture<CustomWebApplicationFactory>
         var prov = reactDoc.RootElement.GetProperty("proveedor");
         Assert.True(prov.GetProperty("activo").GetBoolean());
     }
+
+    [Fact]
+    public async Task EliminarYRestaurarDeuda_DebeCambiarActivoCorrectamente()
+    {
+        // 1. Crear deuda en Proveedor 1
+        var payload = new
+        {
+            monto = 5000m,
+            concepto = "Deuda Para Eliminar y Restaurar",
+            tipoComprobante = "Factura"
+        };
+        var resCrear = await _client.PostAsJsonAsync("/api/proveedores/1/deudas", payload);
+        Assert.Equal(HttpStatusCode.Created, resCrear.StatusCode);
+        using var docCrear = JsonDocument.Parse(await resCrear.Content.ReadAsStringAsync());
+        var deudaId = docCrear.RootElement.GetProperty("id").GetInt32();
+
+        // 2. Eliminar deuda
+        var resEliminar = await _client.DeleteAsync($"/api/proveedores/1/deudas/{deudaId}");
+        Assert.Equal(HttpStatusCode.OK, resEliminar.StatusCode);
+
+        // 3. Restaurar deuda
+        var resRestaurar = await _client.PatchAsync($"/api/proveedores/1/deudas/{deudaId}/restaurar", null);
+        Assert.Equal(HttpStatusCode.OK, resRestaurar.StatusCode);
+    }
 }

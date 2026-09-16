@@ -34,11 +34,16 @@ public class ObtenerHistorialProveedor : IEndpoint
                 MedioPago = (string?)null,
                 Referencia = (string?)null,
                 Fecha = d.FechaDeuda,
-                d.Activo
+                d.Activo,
+                deudaId = (int?)d.Id,
+                deudaConcepto = (string?)null,
+                deudaTipoComprobante = (string?)null,
+                deudaNumeroComprobante = (string?)null
             })
             .ToListAsync();
 
         var pagos = await db.Pagos
+            .Include(p => p.Deuda)
             .Where(p => p.ProveedorId == id)
             .Select(p => new
             {
@@ -51,7 +56,11 @@ public class ObtenerHistorialProveedor : IEndpoint
                 MedioPago = (string?)p.MedioPago.ToString(),
                 p.Referencia,
                 Fecha = p.FechaPago,
-                p.Activo
+                p.Activo,
+                deudaId = p.DeudaId,
+                deudaConcepto = p.Deuda != null ? p.Deuda.Concepto : null,
+                deudaTipoComprobante = p.Deuda != null ? p.Deuda.TipoComprobante.ToString() : null,
+                deudaNumeroComprobante = p.Deuda != null ? p.Deuda.NumeroComprobante : null
             })
             .ToListAsync();
 

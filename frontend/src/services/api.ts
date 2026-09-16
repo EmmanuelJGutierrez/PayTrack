@@ -70,6 +70,14 @@ export async function eliminarDeuda(proveedorId: number, deudaId: number): Promi
   if (!res.ok) throw new Error(body.message || 'Error al eliminar deuda');
 }
 
+export async function restaurarDeuda(proveedorId: number, deudaId: number): Promise<void> {
+  const res = await fetch(`${API_BASE}/proveedores/${proveedorId}/deudas/${deudaId}/restaurar`, {
+    method: 'PATCH'
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || 'Error al restaurar deuda');
+}
+
 export async function createPago(proveedorId: number, data: {
   monto: number;
   medioPago: 'Efectivo' | 'Transferencia' | 'Debito' | 'Cheque' | 'Otro';
