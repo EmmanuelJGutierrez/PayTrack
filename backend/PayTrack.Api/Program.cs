@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +12,6 @@ using PayTrack.Api.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuración de base de datos SQLite
-// En Desarrollo se guarda en la carpeta local "data/" en Disco D: para no ocupar C:
-// En Producción / ejecutable empaquetado se usa %APPDATA%/PayTrack
 string dbPath;
 if (builder.Environment.IsDevelopment())
 {
@@ -30,6 +29,13 @@ else
 builder.Services.AddDbContext<PayTrackDbContext>(options =>
 {
     options.UseSqlite($"Data Source={dbPath}");
+});
+
+// Evitar ciclos de serialización JSON en relaciones bidireccionales
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 
 // Auto-registro de todos los slices de Vertical Slice Architecture

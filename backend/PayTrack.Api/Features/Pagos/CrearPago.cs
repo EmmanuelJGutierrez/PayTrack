@@ -99,6 +99,17 @@ public class CrearPago : IEndpoint
         db.Pagos.Add(pago);
         await db.SaveChangesAsync();
 
-        return Results.Created($"/api/proveedores/{id}/pagos/{pago.Id}", pago);
+        return Results.Created($"/api/proveedores/{id}/pagos/{pago.Id}", new
+        {
+            pago.Id,
+            pago.ProveedorId,
+            pago.DeudaId,
+            pago.Monto,
+            MedioPago = pago.MedioPago.ToString(),
+            pago.Referencia,
+            pago.Comentario,
+            pago.FechaPago,
+            pago.Activo
+        });
     }
 }
