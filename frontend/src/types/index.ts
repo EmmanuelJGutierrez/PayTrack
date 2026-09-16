@@ -30,12 +30,27 @@ export interface DeudaResumen {
   colorEstado: 'verde' | 'amarillo' | 'rojo' | 'gris';
 }
 
+export interface PagoItemResumen {
+  id: number;
+  proveedorId: number;
+  proveedorNombre: string;
+  monto: number;
+  fechaPago: string;
+  medioPago: string;
+  referencia?: string;
+  comentario?: string;
+  deudaConcepto?: string;
+  tipoComprobante?: 'Remito' | 'Factura';
+  numeroComprobante?: string;
+}
+
 export interface ResumenMensual {
   anio: number;
   mes: number;
   totalPagado: number;
   cantidadPagos: number;
   porMedioPago: Record<string, number>;
+  pagos?: PagoItemResumen[];
 }
 
 export interface MovimientoHistorial {

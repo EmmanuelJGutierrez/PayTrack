@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle, FileSpreadsheet } from 'lucide-react';
 
 interface Props {
   anio: number;
@@ -10,6 +10,7 @@ interface Props {
   onOpenNewProvider: () => void;
   onOpenMonthlySummary: () => void;
   onOpenHelp: () => void;
+  onExportPlanilla?: () => void;
 }
 
 const NOMBRES_MESES = [
@@ -25,7 +26,8 @@ export const Header: React.FC<Props> = ({
   onOpenCalendar,
   onOpenNewProvider,
   onOpenMonthlySummary,
-  onOpenHelp
+  onOpenHelp,
+  onExportPlanilla
 }) => {
   const nombreMes = NOMBRES_MESES[mes - 1] || 'Mes';
 
@@ -81,7 +83,9 @@ export const Header: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#475569'
+              color: '#475569',
+              border: 'none',
+              cursor: 'pointer'
             }}
             title="Mes anterior"
           >
@@ -97,7 +101,9 @@ export const Header: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#475569'
+              color: '#475569',
+              border: 'none',
+              cursor: 'pointer'
             }}
             title="Mes siguiente"
           >
@@ -107,24 +113,52 @@ export const Header: React.FC<Props> = ({
       </div>
 
       {/* Acciones principales a la derecha */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {onExportPlanilla && (
+          <button
+            onClick={onExportPlanilla}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 14px',
+              backgroundColor: '#f8fafc',
+              color: '#334155',
+              borderRadius: '10px',
+              border: '1.5px solid #cbd5e1',
+              fontWeight: 600,
+              fontSize: '13px',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8fafc')}
+            title="Exporta el estado general de deudas de todos los proveedores a una planilla Excel (.csv)"
+          >
+            <FileSpreadsheet size={16} color="#15803d" />
+            <span>Exportar Planilla</span>
+          </button>
+        )}
+
         <button
           onClick={onOpenMonthlySummary}
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '10px 18px',
+            padding: '9px 16px',
             backgroundColor: '#f0fdf4',
             color: '#15803d',
             borderRadius: '10px',
             border: '1.5px solid #bbf7d0',
             fontWeight: 700,
-            fontSize: '14px'
+            fontSize: '13px',
+            cursor: 'pointer'
           }}
+          title="Ver resumen y desglose de pagos del mes"
         >
-          <BarChart3 size={18} />
-          <span>Resumen de Pagos del Mes</span>
+          <BarChart3 size={17} />
+          <span>Resumen del Mes</span>
         </button>
 
         <button
@@ -133,34 +167,38 @@ export const Header: React.FC<Props> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '10px 20px',
+            padding: '9px 18px',
             backgroundColor: '#2563eb',
             color: '#ffffff',
             borderRadius: '10px',
+            border: 'none',
             fontWeight: 700,
-            fontSize: '14px',
-            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)'
+            fontSize: '13px',
+            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
+            cursor: 'pointer'
           }}
         >
-          <Plus size={18} />
+          <Plus size={17} />
           <span>+ Nuevo Proveedor</span>
         </button>
 
         <button
           onClick={onOpenHelp}
           style={{
-            width: '40px',
-            height: '40px',
+            width: '38px',
+            height: '38px',
             borderRadius: '50%',
             backgroundColor: '#1e293b',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            border: 'none',
+            cursor: 'pointer'
           }}
           title="Ayuda / Instrucciones"
         >
-          <HelpCircle size={20} />
+          <HelpCircle size={18} />
         </button>
       </div>
     </header>

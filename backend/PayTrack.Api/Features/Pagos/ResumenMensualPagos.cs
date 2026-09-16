@@ -27,7 +27,9 @@ public class ResumenMensualPagos : IEndpoint
 
         var pagosMes = await db.Pagos
             .Include(p => p.Proveedor)
+            .Include(p => p.Deuda)
             .Where(p => p.Activo && p.FechaPago.Year == y && p.FechaPago.Month == m)
+            .OrderByDescending(p => p.FechaPago)
             .ToListAsync();
 
         var totalPagado = pagosMes.Sum(p => p.Monto);
@@ -39,13 +41,29 @@ public class ResumenMensualPagos : IEndpoint
                 medio => pagosMes.Where(p => p.MedioPago == medio).Sum(p => p.Monto)
             );
 
+        var detallePagos = pagosMes.Select(p => new
+        {
+            p.Id,
+            p.ProveedorId,
+            ProveedorNombre = p.Proveedor?.Nombre ?? "Sin proveedor",
+            p.Monto,
+            p.FechaPago,
+            MedioPago = p.MedioPago.ToString(),
+            p.Referencia,
+            p.Comentario,
+            DeudaConcepto = p.Deuda != null ? p.Deuda.Concepto : null,
+            TipoComprobante = p.Deuda != null ? p.Deuda.TipoComprobante.ToString() : null,
+            NumeroComprobante = p.Deuda != null ? p.Deuda.NumeroComprobante : null
+        }).ToList();
+
         return Results.Ok(new
         {
             anio = y,
             mes = m,
             totalPagado,
             cantidadPagos,
-            porMedioPago = desglose
+            porMedioPago = desglose,
+            pagos = detallePagos
         });
     }
 }

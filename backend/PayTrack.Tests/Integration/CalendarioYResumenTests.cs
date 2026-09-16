@@ -59,5 +59,7 @@ public class CalendarioYResumenTests : IClassFixture<CustomWebApplicationFactory
         Assert.True(root.GetProperty("totalPagado").GetDecimal() >= 12000m);
         Assert.True(root.GetProperty("porMedioPago").TryGetProperty("Transferencia", out var trf));
         Assert.True(trf.GetDecimal() >= 12000m);
+        Assert.True(root.TryGetProperty("pagos", out var pagosArray));
+        Assert.True(pagosArray.GetArrayLength() >= 1);
     }
 }

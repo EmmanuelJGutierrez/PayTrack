@@ -11,6 +11,7 @@ import { HelpModal } from './components/modals/HelpModal';
 import { CalendarModal } from './components/calendar/CalendarModal';
 import { fetchProveedores, fetchDeudas } from './services/api';
 import type { ProveedorResumen, DeudaResumen } from './types';
+import { exportPlanillaProveedoresToCsv } from './utils/exporter';
 
 export const App: React.FC = () => {
   // Inicializamos en Julio 2026 (exacto como el diseño de Figma)
@@ -117,6 +118,11 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleExportPlanilla = () => {
+    if (proveedores.length === 0) return;
+    exportPlanillaProveedoresToCsv(proveedores, NOMBRES_MESES[mes - 1] || 'Mes', anio);
+  };
+
   const selectedProvider = proveedores.find(p => p.id === selectedProviderId);
 
   return (
@@ -148,6 +154,7 @@ export const App: React.FC = () => {
         onOpenNewProvider={() => setIsAddProviderOpen(true)}
         onOpenMonthlySummary={() => setIsMonthlySummaryOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
+        onExportPlanilla={handleExportPlanilla}
       />
 
       {/* Cuerpo Principal (Sidebar + Detalle) */}
