@@ -27,7 +27,9 @@ public class ListarProveedores : IEndpoint
         decimal PagadoEsteMes,
         int PorcentajeSaldado,
         string ColorEstado,
-        string EstadoTexto
+        string EstadoTexto,
+        bool TieneDeudasVencidas,
+        bool TieneDeudasPorVencer
     );
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -46,9 +48,11 @@ public class ListarProveedores : IEndpoint
     {
         var y = anio ?? DateTime.Now.Year;
         var m = mes ?? DateTime.Now.Month;
+        var hoy = DateTime.UtcNow.Date;
 
         var query = db.Proveedores
             .Include(p => p.Deudas)
+                .ThenInclude(d => d.Pagos)
             .Include(p => p.Pagos)
             .AsSplitQuery()
             .AsQueryable();
@@ -82,6 +86,28 @@ public class ListarProveedores : IEndpoint
 
             var (porcentaje, color, texto) = EstadoColorCalculator.Calcular(totalDeuda, totalPagado);
 
+            bool tieneVencidas = false;
+            bool tienePorVencer = false;
+
+            foreach (var d in deudasActivas)
+            {
+                var pagosDeuda = d.Pagos.Where(pg => pg.Activo).Sum(pg => pg.Monto);
+                var saldoDeuda = Math.Max(0, d.Monto - pagosDeuda);
+
+                if (saldoDeuda > 0 && d.FechaVencimiento.HasValue)
+                {
+                    var dias = (d.FechaVencimiento.Value.Date - hoy).TotalDays;
+                    if (dias < 0)
+                    {
+                        tieneVencidas = true;
+                    }
+                    else if (dias <= 7)
+                    {
+                        tienePorVencer = true;
+                    }
+                }
+            }
+
             lista.Add(new Response(
                 p.Id,
                 p.Nombre,
@@ -95,11 +121,18 @@ public class ListarProveedores : IEndpoint
                 pagadoEsteMes,
                 porcentaje,
                 color,
-                texto
+                texto,
+                tieneVencidas,
+                tienePorVencer
             ));
         }
 
-        var ordenados = lista.OrderByDescending(x => x.SaldoPendiente).ThenBy(x => x.Nombre).ToList();
+        var ordenados = lista.OrderByDescending(x => x.TieneDeudasVencidas)
+                             .ThenByDescending(x => x.TieneDeudasPorVencer)
+                             .ThenByDescending(x => x.SaldoPendiente)
+                             .ThenBy(x => x.Nombre)
+                             .ToList();
+
         return Results.Ok(ordenados);
     }
 }

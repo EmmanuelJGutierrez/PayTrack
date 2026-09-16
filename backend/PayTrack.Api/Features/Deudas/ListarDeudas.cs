@@ -22,6 +22,9 @@ public class ListarDeudas : IEndpoint
         string TipoComprobante,
         string? NumeroComprobante,
         DateTime FechaDeuda,
+        DateTime? FechaVencimiento,
+        string EstadoVencimiento,
+        int? DiasParaVencer,
         bool Activo,
         decimal TotalPagado,
         decimal SaldoPendiente,
@@ -41,6 +44,7 @@ public class ListarDeudas : IEndpoint
     {
         var y = anio ?? DateTime.Now.Year;
         var m = mes ?? DateTime.Now.Month;
+        var hoy = DateTime.UtcNow.Date;
 
         var deudas = await db.Deudas
             .Where(d => d.ProveedorId == id && d.Activo)
@@ -62,6 +66,36 @@ public class ListarDeudas : IEndpoint
 
             var (porcentaje, color, _) = EstadoColorCalculator.Calcular(d.Monto, totalPagado);
 
+            string estadoVencimiento;
+            int? diasParaVencer = null;
+
+            if (saldoPendiente <= 0)
+            {
+                estadoVencimiento = "Saldado";
+            }
+            else if (!d.FechaVencimiento.HasValue)
+            {
+                estadoVencimiento = "SinVencimiento";
+            }
+            else
+            {
+                var diff = (d.FechaVencimiento.Value.Date - hoy).TotalDays;
+                diasParaVencer = (int)diff;
+
+                if (diff < 0)
+                {
+                    estadoVencimiento = "Vencido";
+                }
+                else if (diff <= 7)
+                {
+                    estadoVencimiento = "PorVencer";
+                }
+                else
+                {
+                    estadoVencimiento = "EnFecha";
+                }
+            }
+
             lista.Add(new Response(
                 d.Id,
                 d.ProveedorId,
@@ -70,6 +104,9 @@ public class ListarDeudas : IEndpoint
                 d.TipoComprobante.ToString(),
                 d.NumeroComprobante,
                 d.FechaDeuda,
+                d.FechaVencimiento,
+                estadoVencimiento,
+                diasParaVencer,
                 d.Activo,
                 totalPagado,
                 saldoPendiente,

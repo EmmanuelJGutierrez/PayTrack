@@ -11,6 +11,16 @@ public static class DbInitializer
     {
         db.Database.EnsureCreated();
 
+        // Asegurar que la columna FechaVencimiento exista si la base fue creada previamente
+        try
+        {
+            db.Database.ExecuteSqlRaw("ALTER TABLE Deudas ADD COLUMN FechaVencimiento TEXT NULL;");
+        }
+        catch
+        {
+            // Columna ya existe, ignorar
+        }
+
         if (db.Proveedores.Any())
         {
             return;
@@ -61,7 +71,8 @@ public static class DbInitializer
             Concepto = "Mantenimiento Anual",
             TipoComprobante = TipoComprobante.Remito,
             NumeroComprobante = "REM-0004-00129",
-            FechaDeuda = new DateTime(2026, 7, 1, 9, 0, 0, DateTimeKind.Utc)
+            FechaDeuda = new DateTime(2026, 7, 1, 9, 0, 0, DateTimeKind.Utc),
+            FechaVencimiento = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc)
         };
 
         var deudaLicencia = new Deuda
@@ -71,7 +82,8 @@ public static class DbInitializer
             Concepto = "Licencia Software ERP",
             TipoComprobante = TipoComprobante.Factura,
             NumeroComprobante = "FAC-A-0002-00431",
-            FechaDeuda = new DateTime(2026, 7, 10, 11, 30, 0, DateTimeKind.Utc)
+            FechaDeuda = new DateTime(2026, 7, 10, 11, 30, 0, DateTimeKind.Utc),
+            FechaVencimiento = new DateTime(2026, 7, 20, 0, 0, 0, DateTimeKind.Utc)
         };
 
         db.Deudas.AddRange(deudaMantenimiento, deudaLicencia);
@@ -84,7 +96,8 @@ public static class DbInitializer
             Concepto = "Resmas de papel y cartuchos",
             TipoComprobante = TipoComprobante.Factura,
             NumeroComprobante = "FAC-A-0001-1002",
-            FechaDeuda = new DateTime(2026, 7, 5, 10, 0, 0, DateTimeKind.Utc)
+            FechaDeuda = new DateTime(2026, 7, 5, 10, 0, 0, DateTimeKind.Utc),
+            FechaVencimiento = new DateTime(2026, 7, 10, 0, 0, 0, DateTimeKind.Utc) // Vencida
         });
 
         db.Deudas.Add(new Deuda
@@ -94,7 +107,8 @@ public static class DbInitializer
             Concepto = "Artículos de limpieza",
             TipoComprobante = TipoComprobante.Remito,
             NumeroComprobante = "REM-0001-554",
-            FechaDeuda = new DateTime(2026, 7, 8, 14, 0, 0, DateTimeKind.Utc)
+            FechaDeuda = new DateTime(2026, 7, 8, 14, 0, 0, DateTimeKind.Utc),
+            FechaVencimiento = new DateTime(2026, 7, 28, 0, 0, 0, DateTimeKind.Utc) // En fecha
         });
 
         db.Deudas.Add(new Deuda
@@ -104,7 +118,8 @@ public static class DbInitializer
             Concepto = "Lote repuestos importados",
             TipoComprobante = TipoComprobante.Factura,
             NumeroComprobante = "FAC-A-0005-0988",
-            FechaDeuda = new DateTime(2026, 7, 2, 8, 0, 0, DateTimeKind.Utc)
+            FechaDeuda = new DateTime(2026, 7, 2, 8, 0, 0, DateTimeKind.Utc),
+            FechaVencimiento = new DateTime(2026, 8, 2, 0, 0, 0, DateTimeKind.Utc)
         });
 
         db.SaveChanges();

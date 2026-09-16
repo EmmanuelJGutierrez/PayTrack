@@ -1,34 +1,42 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { ModalWrapper } from './ModalWrapper';
-import { fetchHistorial } from '../../services/api';
+import { fetchHistorial, anularPago } from '../../services/api';
 import type { MovimientoHistorial } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
 import { exportHistorialProveedorToCsv } from '../../utils/exporter';
-import { FileSpreadsheet, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { FileSpreadsheet, ArrowDownRight, ArrowUpRight, Trash2 } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   proveedorId: number;
   proveedorNombre: string;
+  onSuccess?: () => void;
 }
 
 export const HistoryModal: React.FC<Props> = ({
   isOpen,
   onClose,
   proveedorId,
-  proveedorNombre
+  proveedorNombre,
+  onSuccess
 }) => {
   const [items, setItems] = useState<MovimientoHistorial[]>([]);
   const [loading, setLoading] = useState(false);
+  const [anulandoId, setAnulandoId] = useState<number | null>(null);
+
+  const loadData = () => {
+    if (!proveedorId) return;
+    setLoading(true);
+    fetchHistorial(proveedorId)
+      .then(setItems)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
     if (isOpen && proveedorId) {
-      setLoading(true);
-      fetchHistorial(proveedorId)
-        .then(setItems)
-        .catch(console.error)
-        .finally(() => setLoading(false));
+      loadData();
     }
   }, [isOpen, proveedorId]);
 
@@ -37,8 +45,29 @@ export const HistoryModal: React.FC<Props> = ({
     exportHistorialProveedorToCsv(proveedorNombre, items);
   };
 
+  const handleAnular = async (mov: MovimientoHistorial) => {
+    const fechaStr = new Date(mov.fecha).toLocaleDateString();
+    const confirmacion = window.confirm(
+      `¿Estás seguro de anular el pago de $${mov.monto.toLocaleString()} (${mov.medioPago || 'Pago'}, ${fechaStr})?\n\n` +
+      `El saldo de la deuda aumentará automáticamente por este monto.`
+    );
+
+    if (!confirmacion) return;
+
+    try {
+      setAnulandoId(mov.id);
+      await anularPago(mov.id);
+      loadData();
+      if (onSuccess) onSuccess();
+    } catch (err: any) {
+      alert(err.message || 'Error al anular pago');
+    } finally {
+      setAnulandoId(null);
+    }
+  };
+
   return (
-    <ModalWrapper isOpen={isOpen} onClose={onClose} title={`Historial — ${proveedorNombre}`} maxWidth="720px">
+    <ModalWrapper isOpen={isOpen} onClose={onClose} title={`Historial — ${proveedorNombre}`} maxWidth="740px">
       {/* Barra de Acciones Superior */}
       <div
         style={{
@@ -47,7 +76,9 @@ export const HistoryModal: React.FC<Props> = ({
           justifyContent: 'space-between',
           marginBottom: '16px',
           paddingBottom: '12px',
-          borderBottom: '1px solid #e5e7eb'
+          borderBottom: '1px solid #e5e7eb',
+          flexWrap: 'wrap',
+          gap: '10px'
         }}
       >
         <span style={{ fontSize: '13px', color: '#6b7280' }}>
@@ -103,9 +134,11 @@ export const HistoryModal: React.FC<Props> = ({
           No hay movimientos registrados para este proveedor.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '450px', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '460px', overflowY: 'auto' }}>
           {items.map((mov, idx) => {
             const isDeuda = mov.tipoMovimiento === 'Deuda';
+            const isPago = mov.tipoMovimiento === 'Pago';
+
             return (
               <div
                 key={idx}
@@ -113,22 +146,22 @@ export const HistoryModal: React.FC<Props> = ({
                   padding: '12px 16px',
                   borderRadius: '10px',
                   border: '1px solid #e5e7eb',
-                  backgroundColor: isDeuda ? '#ffffff' : '#f0fdf4',
+                  backgroundColor: !mov.activo ? '#f9fafb' : isDeuda ? '#ffffff' : '#f0fdf4',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '12px',
-                  opacity: mov.activo ? 1 : 0.5
+                  opacity: mov.activo ? 1 : 0.6
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                   <div
                     style={{
                       width: '36px',
                       height: '36px',
                       borderRadius: '8px',
-                      backgroundColor: isDeuda ? '#fee2e2' : '#dcfce7',
-                      color: isDeuda ? '#dc2626' : '#16a34a',
+                      backgroundColor: !mov.activo ? '#e5e7eb' : isDeuda ? '#fee2e2' : '#dcfce7',
+                      color: !mov.activo ? '#6b7280' : isDeuda ? '#dc2626' : '#16a34a',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -138,9 +171,16 @@ export const HistoryModal: React.FC<Props> = ({
                     {isDeuda ? <ArrowDownRight size={20} /> : <ArrowUpRight size={20} />}
                   </div>
 
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 700, fontSize: '14px', color: '#111827' }}>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          fontSize: '14px',
+                          color: '#111827',
+                          textDecoration: mov.activo ? 'none' : 'line-through'
+                        }}
+                      >
                         {mov.concepto}
                       </span>
                       {mov.tipoComprobante && (
@@ -160,7 +200,22 @@ export const HistoryModal: React.FC<Props> = ({
                           {mov.medioPago}
                         </span>
                       )}
+                      {!mov.activo && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#dc2626',
+                            backgroundColor: '#fee2e2',
+                            padding: '1px 6px',
+                            borderRadius: '4px'
+                          }}
+                        >
+                          Anulado
+                        </span>
+                      )}
                     </div>
+
                     <span style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginTop: '2px' }}>
                       {new Date(mov.fecha).toLocaleDateString()} {new Date(mov.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       {mov.referencia && ` • Ref: ${mov.referencia}`}
@@ -168,18 +223,46 @@ export const HistoryModal: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <span
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: 800,
-                      color: isDeuda ? '#dc2626' : '#16a34a'
-                    }}
-                  >
-                    {isDeuda ? `+$${mov.monto.toLocaleString()}` : `-$${mov.monto.toLocaleString()}`}
-                  </span>
-                  {!mov.activo && (
-                    <span style={{ display: 'block', fontSize: '11px', color: '#9ca3af' }}>Anulado</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <span
+                      style={{
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        color: !mov.activo ? '#9ca3af' : isDeuda ? '#dc2626' : '#16a34a',
+                        textDecoration: mov.activo ? 'none' : 'line-through'
+                      }}
+                    >
+                      {isDeuda ? `+$${mov.monto.toLocaleString()}` : `-$${mov.monto.toLocaleString()}`}
+                    </span>
+                  </div>
+
+                  {/* Botón para anular pago activo */}
+                  {isPago && mov.activo && (
+                    <button
+                      onClick={() => handleAnular(mov)}
+                      disabled={anulandoId === mov.id}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        backgroundColor: '#fff1f2',
+                        border: '1px solid #fecdd3',
+                        color: '#e11d48',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#ffe4e6')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff1f2')}
+                      title="Anular este pago (recalcula los saldos automáticamente)"
+                    >
+                      <Trash2 size={12} />
+                      <span>{anulandoId === mov.id ? 'Anulando...' : 'Anular'}</span>
+                    </button>
                   )}
                 </div>
               </div>

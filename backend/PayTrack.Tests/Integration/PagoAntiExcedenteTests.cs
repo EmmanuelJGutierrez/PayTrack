@@ -84,4 +84,31 @@ public class PagoAntiExcedenteTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(5000m, root.GetProperty("monto").GetDecimal());
         Assert.Equal("Efectivo", root.GetProperty("medioPago").GetString());
     }
+
+    [Fact]
+    public async Task AnularPago_PagoExistente_DebeRetornar200YAnularCorrectamente()
+    {
+        // Pago 2 es de Gamma Corp ($12,000)
+        var response = await _client.DeleteAsync("/api/pagos/2");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        // Intentar anularlo de nuevo debe dar 400 PAGO_YA_ANULADO
+        var reintento = await _client.DeleteAsync("/api/pagos/2");
+        Assert.Equal(HttpStatusCode.BadRequest, reintento.StatusCode);
+    }
+
+    [Fact]
+    public async Task ListarDeudas_DebeIncluirEstadoVencimiento()
+    {
+        var response = await _client.GetAsync("/api/proveedores/1/deudas");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(content);
+        var array = doc.RootElement;
+
+        Assert.True(array.GetArrayLength() > 0);
+        var primera = array[0];
+        Assert.True(primera.TryGetProperty("estadoVencimiento", out _));
+    }
 }

@@ -46,6 +46,7 @@ public class PayTrackDbContext : DbContext
             entity.Property(e => e.TipoComprobante).HasConversion<string>().IsRequired();
             entity.Property(e => e.NumeroComprobante).HasMaxLength(80);
             entity.Property(e => e.Activo).HasDefaultValue(true);
+            entity.Property(e => e.FechaVencimiento);
 
             entity.HasMany(e => e.Pagos)
                 .WithOne(p => p.Deuda)

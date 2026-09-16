@@ -12,7 +12,14 @@ namespace PayTrack.Api.Features.Deudas;
 
 public class CrearDeuda : IEndpoint
 {
-    public record Request(decimal Monto, string Concepto, string TipoComprobante, string? NumeroComprobante, DateTime? FechaDeuda);
+    public record Request(
+        decimal Monto,
+        string Concepto,
+        string TipoComprobante,
+        string? NumeroComprobante,
+        DateTime? FechaDeuda,
+        DateTime? FechaVencimiento
+    );
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -52,6 +59,7 @@ public class CrearDeuda : IEndpoint
             TipoComprobante = tipo,
             NumeroComprobante = req.NumeroComprobante?.Trim(),
             FechaDeuda = req.FechaDeuda ?? DateTime.UtcNow,
+            FechaVencimiento = req.FechaVencimiento,
             FechaCreacion = DateTime.UtcNow
         };
 

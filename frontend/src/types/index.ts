@@ -12,6 +12,8 @@
   porcentajeSaldado: number;
   colorEstado: 'verde' | 'amarillo' | 'rojo' | 'gris';
   estadoTexto: 'Saldado' | 'Parcial' | 'Pendiente' | 'Sin deuda';
+  tieneDeudasVencidas?: boolean;
+  tieneDeudasPorVencer?: boolean;
 }
 
 export interface DeudaResumen {
@@ -22,6 +24,9 @@ export interface DeudaResumen {
   tipoComprobante: 'Remito' | 'Factura';
   numeroComprobante?: string;
   fechaDeuda: string;
+  fechaVencimiento?: string;
+  estadoVencimiento?: 'Vencido' | 'PorVencer' | 'EnFecha' | 'Saldado' | 'SinVencimiento';
+  diasParaVencer?: number;
   activo: boolean;
   totalPagado: number;
   saldoPendiente: number;

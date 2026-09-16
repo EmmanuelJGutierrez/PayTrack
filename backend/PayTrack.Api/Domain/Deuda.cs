@@ -20,6 +20,7 @@ public class Deuda
     public TipoComprobante TipoComprobante { get; set; } = TipoComprobante.Factura;
     public string? NumeroComprobante { get; set; }
     public DateTime FechaDeuda { get; set; }
+    public DateTime? FechaVencimiento { get; set; }
     public bool Activo { get; set; } = true;
     public DateTime? FechaBaja { get; set; }
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Building2, Search } from 'lucide-react';
+﻿import React from 'react';
+import { Building2, Search, AlertTriangle, Clock } from 'lucide-react';
 import type { ProveedorResumen } from '../../types';
 
 interface Props {
@@ -40,7 +40,7 @@ export const ProviderSidebar: React.FC<Props> = ({
           </span>
         </div>
 
-        {/* Buscador Rápido (promovido al core) */}
+        {/* Buscador Rápido */}
         <div style={{ position: 'relative' }}>
           <Search
             size={16}
@@ -82,7 +82,7 @@ export const ProviderSidebar: React.FC<Props> = ({
                 onClick={() => onSelect(p.id)}
                 style={{
                   position: 'relative',
-                  padding: '14px 16px',
+                  padding: '12px 14px',
                   borderRadius: '10px',
                   cursor: 'pointer',
                   backgroundColor: isSelected ? '#eef4fe' : 'transparent',
@@ -106,14 +106,56 @@ export const ProviderSidebar: React.FC<Props> = ({
                   />
                 )}
 
-                <div style={{ fontWeight: isSelected ? 800 : 700, fontSize: '15px', color: '#1f2937' }}>
-                  {p.nombre}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <span style={{ fontWeight: isSelected ? 800 : 700, fontSize: '14px', color: '#1f2937' }}>
+                    {p.nombre}
+                  </span>
+
+                  {p.tieneDeudasVencidas ? (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: '#b91c1c',
+                        backgroundColor: '#fee2e2',
+                        border: '1px solid #fca5a5',
+                        padding: '1px 5px',
+                        borderRadius: '4px'
+                      }}
+                      title="Tiene deudas vencidas"
+                    >
+                      <AlertTriangle size={10} />
+                      Vencido
+                    </span>
+                  ) : p.tieneDeudasPorVencer ? (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: '#b45309',
+                        backgroundColor: '#fef3c7',
+                        border: '1px solid #fde68a',
+                        padding: '1px 5px',
+                        borderRadius: '4px'
+                      }}
+                      title="Tiene deudas que vencen en los próximos 7 días"
+                    >
+                      <Clock size={10} />
+                      Próximo
+                    </span>
+                  ) : null}
                 </div>
 
                 <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span
                     style={{
-                      fontSize: '13px',
+                      fontSize: '12px',
                       fontWeight: 700,
                       color: tieneSaldo ? '#dc2626' : '#16a34a',
                       opacity: tieneSaldo ? 0.9 : 1

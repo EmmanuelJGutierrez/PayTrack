@@ -179,6 +179,7 @@ export const App: React.FC = () => {
               onOpenAddDebt={() => setIsAddDebtOpen(true)}
               onOpenAddPayment={handleOpenAddPayment}
               onOpenHistory={() => setIsHistoryOpen(true)}
+              onDebtDeleted={handleDataChanged}
             />
           ) : (
             <div style={{ padding: '60px 24px', textAlign: 'center', color: '#9ca3af' }}>
@@ -238,6 +239,7 @@ export const App: React.FC = () => {
             onClose={() => setIsHistoryOpen(false)}
             proveedorId={selectedProvider.id}
             proveedorNombre={selectedProvider.nombre}
+            onSuccess={handleDataChanged}
           />
         </>
       )}

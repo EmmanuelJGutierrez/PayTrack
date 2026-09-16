@@ -49,6 +49,7 @@ export async function createDeuda(proveedorId: number, data: {
   tipoComprobante: 'Remito' | 'Factura';
   numeroComprobante?: string;
   fechaDeuda?: string;
+  fechaVencimiento?: string;
 }): Promise<void> {
   const res = await fetch(`${API_BASE}/proveedores/${proveedorId}/deudas`, {
     method: 'POST',
@@ -57,6 +58,14 @@ export async function createDeuda(proveedorId: number, data: {
   });
   const body = await res.json();
   if (!res.ok) throw new Error(body.message || 'Error al registrar deuda');
+}
+
+export async function eliminarDeuda(proveedorId: number, deudaId: number): Promise<void> {
+  const res = await fetch(`${API_BASE}/proveedores/${proveedorId}/deudas/${deudaId}`, {
+    method: 'DELETE'
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || 'Error al eliminar deuda');
 }
 
 export async function createPago(proveedorId: number, data: {
@@ -74,6 +83,14 @@ export async function createPago(proveedorId: number, data: {
   });
   const body = await res.json();
   if (!res.ok) throw new Error(body.message || 'Error al registrar pago');
+}
+
+export async function anularPago(pagoId: number): Promise<void> {
+  const res = await fetch(`${API_BASE}/pagos/${pagoId}`, {
+    method: 'DELETE'
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || 'Error al anular pago');
 }
 
 export async function fetchResumenMensual(anio: number, mes: number): Promise<ResumenMensual> {
