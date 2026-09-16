@@ -51,6 +51,23 @@ public class CrearDeuda : IEndpoint
             return Results.BadRequest(new { error = true, code = "TIPO_COMPROBANTE_INVALIDO", message = "El tipo de comprobante debe ser 'Remito' o 'Factura'." });
         }
 
+        DateTime fechaFinal;
+        if (req.FechaDeuda.HasValue)
+        {
+            if (req.FechaDeuda.Value.Date == DateTime.UtcNow.Date)
+            {
+                fechaFinal = DateTime.UtcNow;
+            }
+            else
+            {
+                fechaFinal = req.FechaDeuda.Value;
+            }
+        }
+        else
+        {
+            fechaFinal = DateTime.UtcNow;
+        }
+
         var deuda = new Deuda
         {
             ProveedorId = id,
@@ -58,7 +75,7 @@ public class CrearDeuda : IEndpoint
             Concepto = req.Concepto.Trim(),
             TipoComprobante = tipo,
             NumeroComprobante = req.NumeroComprobante?.Trim(),
-            FechaDeuda = req.FechaDeuda ?? DateTime.UtcNow,
+            FechaDeuda = fechaFinal,
             FechaVencimiento = req.FechaVencimiento,
             FechaCreacion = DateTime.UtcNow
         };

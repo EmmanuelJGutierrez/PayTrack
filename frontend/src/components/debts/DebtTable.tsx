@@ -154,116 +154,116 @@ export const DebtTable: React.FC<Props> = ({
   return (
     <div style={{ flex: 1, padding: '28px 36px', overflowY: 'auto' }}>
       {/* Encabezado del Proveedor Seleccionado */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+        {/* Fila 1: Título a la izquierda y Botones de Acción fijados siempre arriba a la derecha */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
             {proveedor.nombre}
           </h1>
 
-          {/* Estadísticas en línea */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', fontSize: '14px', flexWrap: 'wrap' }}>
-            <span style={{ color: '#4b5563', fontWeight: 600 }}>
-              Deudas activas: <strong style={{ color: '#111827' }}>{proveedor.cantidadDeudas}</strong>
-            </span>
+          {/* Botones de acción del proveedor fijados siempre arriba */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            <button
+              onClick={onOpenHistory}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '10px',
+                backgroundColor: '#fef3c7',
+                color: '#92400e',
+                border: '1.5px solid #fde68a',
+                fontWeight: 700,
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#fde68a')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#fef3c7')}
+              title="Ver todos los movimientos (deudas y pagos) de este proveedor"
+            >
+              <History size={17} />
+              <span>Historial de Movimientos</span>
+            </button>
 
-            <span style={{ color: '#4b5563', fontWeight: 600 }}>
-              Saldo pendiente:{' '}
-              <span
-                style={{
-                  color: proveedor.saldoPendiente > 0 ? '#dc2626' : '#16a34a',
-                  fontWeight: 800,
-                  backgroundColor: proveedor.saldoPendiente > 0 ? '#fee2e2' : '#dcfce7',
-                  padding: '2px 8px',
-                  borderRadius: '6px'
-                }}
-              >
-                ${proveedor.saldoPendiente.toLocaleString()}
-              </span>
-            </span>
-
-            <span style={{ color: '#4b5563', fontWeight: 600 }}>
-              Pagado este mes:{' '}
-              <span
-                style={{
-                  color: '#16a34a',
-                  fontWeight: 800,
-                  backgroundColor: '#dcfce7',
-                  padding: '2px 8px',
-                  borderRadius: '6px'
-                }}
-              >
-                ${proveedor.pagadoEsteMes.toLocaleString()}
-              </span>
-            </span>
+            <button
+              onClick={onOpenAddDebt}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '10px',
+                backgroundColor: '#111827',
+                color: '#ffffff',
+                fontWeight: 700,
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              <Plus size={17} />
+              <span>+ Cargar Deuda</span>
+            </button>
           </div>
-
-          {/* Anotador y contacto */}
-          {(proveedor.contacto || proveedor.notas) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px', fontSize: '13px', color: '#6b7280', flexWrap: 'wrap' }}>
-              {proveedor.contacto && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Phone size={14} color="#6b7280" />
-                  <span>{proveedor.contacto}</span>
-                </div>
-              )}
-              {proveedor.notas && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <BookOpen size={14} color="#6b7280" />
-                  <span style={{ fontStyle: 'italic' }}>"{proveedor.notas}"</span>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Botones de acción del proveedor */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Botón Historial en su propio lugar destacado */}
-          <button
-            onClick={onOpenHistory}
-            style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
-              backgroundColor: '#fef3c7',
-              color: '#92400e',
-              border: '1.5px solid #fde68a',
-              fontWeight: 700,
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#fde68a')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#fef3c7')}
-            title="Ver todos los movimientos (deudas y pagos) de este proveedor"
-          >
-            <History size={17} />
-            <span>Historial de Movimientos</span>
-          </button>
+        {/* Fila 2: Estadísticas en línea */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '14px', flexWrap: 'wrap' }}>
+          <span style={{ color: '#4b5563', fontWeight: 600 }}>
+            Deudas activas: <strong style={{ color: '#111827' }}>{proveedor.cantidadDeudas}</strong>
+          </span>
 
-          <button
-            onClick={onOpenAddDebt}
-            style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
-              backgroundColor: '#111827',
-              color: '#ffffff',
-              fontWeight: 700,
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-          >
-            <Plus size={17} />
-            <span>+ Cargar Deuda</span>
-          </button>
+          <span style={{ color: '#4b5563', fontWeight: 600 }}>
+            Saldo pendiente:{' '}
+            <span
+              style={{
+                color: proveedor.saldoPendiente > 0 ? '#dc2626' : '#16a34a',
+                fontWeight: 800,
+                backgroundColor: proveedor.saldoPendiente > 0 ? '#fee2e2' : '#dcfce7',
+                padding: '2px 8px',
+                borderRadius: '6px'
+              }}
+            >
+              ${proveedor.saldoPendiente.toLocaleString()}
+            </span>
+          </span>
+
+          <span style={{ color: '#4b5563', fontWeight: 600 }}>
+            Pagado este mes:{' '}
+            <span
+              style={{
+                color: '#16a34a',
+                fontWeight: 800,
+                backgroundColor: '#dcfce7',
+                padding: '2px 8px',
+                borderRadius: '6px'
+              }}
+            >
+              ${proveedor.pagadoEsteMes.toLocaleString()}
+            </span>
+          </span>
         </div>
+
+        {/* Fila 3: Anotador y contacto */}
+        {(proveedor.contacto || proveedor.notas) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#6b7280', flexWrap: 'wrap' }}>
+            {proveedor.contacto && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Phone size={14} color="#6b7280" />
+                <span>{proveedor.contacto}</span>
+              </div>
+            )}
+            {proveedor.notas && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <BookOpen size={14} color="#6b7280" />
+                <span style={{ fontStyle: 'italic' }}>"{proveedor.notas}"</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tabla / Card con estilo limpio y espacioso */}

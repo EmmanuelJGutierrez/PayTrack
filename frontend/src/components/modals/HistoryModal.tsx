@@ -23,6 +23,16 @@ export const HistoryModal: React.FC<Props> = ({
   onSuccess
 }) => {
   const [items, setItems] = useState<MovimientoHistorial[]>([]);
+  const [filter, setFilter] = useState<'todos' | 'deudas' | 'pagos'>('todos');
+
+  const deudasCount = items.filter(m => m.tipoMovimiento === 'Deuda').length;
+  const pagosCount = items.filter(m => m.tipoMovimiento === 'Pago').length;
+
+  const filteredItems = items.filter(m => {
+    if (filter === 'deudas') return m.tipoMovimiento === 'Deuda';
+    if (filter === 'pagos') return m.tipoMovimiento === 'Pago';
+    return true;
+  });
   const [loading, setLoading] = useState(false);
 
   // Estados para modales de confirmación en la interfaz (sin alerts de navegador)
@@ -131,6 +141,63 @@ export const HistoryModal: React.FC<Props> = ({
         </button>
       </div>
 
+            {/* Filtros de Navegación Rápida */}
+      {!loading && items.length > 0 && (
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={() => setFilter('todos')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: filter === 'todos' ? '1.5px solid #111827' : '1.5px solid #e5e7eb',
+              backgroundColor: filter === 'todos' ? '#111827' : '#ffffff',
+              color: filter === 'todos' ? '#ffffff' : '#4b5563',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            Todos ({items.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('deudas')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: filter === 'deudas' ? '1.5px solid #dc2626' : '1.5px solid #e5e7eb',
+              backgroundColor: filter === 'deudas' ? '#fee2e2' : '#ffffff',
+              color: filter === 'deudas' ? '#991b1b' : '#4b5563',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            📦 Deudas ({deudasCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('pagos')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: filter === 'pagos' ? '1.5px solid #16a34a' : '1.5px solid #e5e7eb',
+              backgroundColor: filter === 'pagos' ? '#dcfce7' : '#ffffff',
+              color: filter === 'pagos' ? '#166534' : '#4b5563',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            💳 Pagos ({pagosCount})
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <p style={{ textAlign: 'center', padding: '32px', color: '#6b7280', fontSize: '15px' }}>
           Cargando historial...
@@ -149,9 +216,23 @@ export const HistoryModal: React.FC<Props> = ({
         >
           No hay movimientos registrados para este proveedor.
         </div>
+      ) : filteredItems.length === 0 ? (
+        <div
+          style={{
+            padding: '32px',
+            backgroundColor: '#f9fafb',
+            borderRadius: '10px',
+            border: '1px dashed #d1d5db',
+            textAlign: 'center',
+            color: '#6b7280',
+            fontSize: '14px'
+          }}
+        >
+          No hay {filter === 'deudas' ? 'deudas registradas' : 'pagos registrados'} para este proveedor.
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '480px', overflowY: 'auto' }}>
-          {items.map((mov, idx) => {
+          {filteredItems.map((mov, idx) => {
             const isDeuda = mov.tipoMovimiento === 'Deuda';
             const isPago = mov.tipoMovimiento === 'Pago';
 

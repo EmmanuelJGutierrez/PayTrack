@@ -66,6 +66,7 @@ public class ObtenerHistorialProveedor : IEndpoint
 
         var timeline = deudas.Concat(pagos)
             .OrderByDescending(x => x.Fecha)
+            .ThenByDescending(x => x.Id)
             .ToList();
 
         return Results.Ok(timeline);

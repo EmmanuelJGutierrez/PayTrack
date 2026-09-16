@@ -118,34 +118,47 @@ export const MonthlySummaryModal: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Desglose por Medio de Pago */}
+          {/* Desglose por Forma de Pago */}
           <div>
             <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#374151', marginBottom: '12px' }}>
               Desglose por Forma de Pago:
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
               {Object.entries(resumen.porMedioPago).map(([medio, total]) => (
                 <div
                   key={medio}
                   style={{
                     backgroundColor: '#ffffff',
-                    border: '1.5px solid #e5e7eb',
-                    borderRadius: '10px',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '12px',
                     padding: '12px 14px',
                     display: 'flex',
-                    alignItems: 'center',
+                    flexDirection: 'column',
                     justifyContent: 'space-between',
-                    gap: '8px'
+                    minHeight: '74px',
+                    gap: '6px',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {getMedioIcon(medio)}
-                    <span style={{ fontWeight: 600, fontSize: '13px', color: '#374151' }}>{medio}</span>
+                    <span style={{ fontWeight: 600, fontSize: '13px', color: '#64748b' }}>{medio}</span>
                   </div>
-                  <span style={{ fontWeight: 700, fontSize: '14px', color: total > 0 ? '#111827' : '#9ca3af' }}>
+                  <div
+                    style={{
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      color: total > 0 ? '#0f172a' : '#94a3b8',
+                      letterSpacing: '-0.02em',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                    title={`$${total.toLocaleString()}`}
+                  >
                     ${total.toLocaleString()}
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
