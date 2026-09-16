@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -39,7 +39,7 @@ export const ModalWrapper: React.FC<Props> = ({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
-        padding: '20px'
+        padding: '16px'
       }}
       onClick={onClose}
     >
@@ -53,14 +53,14 @@ export const ModalWrapper: React.FC<Props> = ({
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '90vh'
+          maxHeight: '92vh'
         }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div
           style={{
-            padding: '18px 24px',
+            padding: '14px 20px',
             borderBottom: '1px solid #e5e7eb',
             display: 'flex',
             alignItems: 'center',
@@ -68,25 +68,31 @@ export const ModalWrapper: React.FC<Props> = ({
             backgroundColor: '#fafaf9'
           }}
         >
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>{title}</h3>
+          <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#111827', margin: 0 }}>{title}</h3>
           <button
             onClick={onClose}
             style={{
-              padding: '8px',
+              padding: '6px',
               borderRadius: '8px',
               color: '#6b7280',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
             }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#e5e7eb')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
             aria-label="Cerrar modal"
           >
-            <X size={20} />
+            <X size={19} />
           </button>
         </div>
 
         {/* Content */}
-        <div style={{ padding: '24px', overflowY: 'auto' }}>{children}</div>
+        <div style={{ padding: '16px 20px', overflowY: 'auto' }}>{children}</div>
       </div>
     </div>
   );

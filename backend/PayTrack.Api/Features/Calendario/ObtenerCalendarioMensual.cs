@@ -18,7 +18,9 @@ public class ObtenerCalendarioMensual : IEndpoint
         int CantidadDeudas,
         int CantidadPagos,
         decimal MontoDeudas,
-        decimal MontoPagado
+        decimal MontoPagado,
+        int CantidadVencimientos = 0,
+        decimal MontoVencimientos = 0
     );
 
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -37,9 +39,14 @@ public class ObtenerCalendarioMensual : IEndpoint
 
         var diasEnMes = DateTime.DaysInMonth(y, m);
 
-        // Deudas y Pagos del mes (ajustados con el offset)
-        var deudas = await db.Deudas
+        // 1. Deudas emitidas en el mes
+        var deudasEmitidas = await db.Deudas
             .Where(d => d.Activo && d.FechaDeuda.Year == y && d.FechaDeuda.Month == m)
+            .ToListAsync();
+
+        // 2. Deudas que vencen en el mes
+        var deudasVencimiento = await db.Deudas
+            .Where(d => d.Activo && d.FechaVencimiento.HasValue && d.FechaVencimiento.Value.Year == y && d.FechaVencimiento.Value.Month == m)
             .ToListAsync();
 
         var pagos = await db.Pagos
@@ -50,15 +57,21 @@ public class ObtenerCalendarioMensual : IEndpoint
 
         for (int dia = 1; dia <= diasEnMes; dia++)
         {
-            var deudasDia = deudas.Where(d => (d.FechaDeuda + offset).Day == dia).ToList();
+            var emitidasDia = deudasEmitidas.Where(d => (d.FechaDeuda + offset).Day == dia).ToList();
+            var vencenDia = deudasVencimiento.Where(d => (d.FechaVencimiento!.Value + offset).Day == dia).ToList();
             var pagosDia = pagos.Where(p => (p.FechaPago + offset).Day == dia).ToList();
+
+            // Total deudas para ese día incluye tanto emitidas como vencimientos (evitando duplicados si vencen el mismo día que se emiten)
+            var totalDeudasDia = emitidasDia.Concat(vencenDia).DistinctBy(d => d.Id).ToList();
 
             resumenPorDia.Add(new DiaResumen(
                 dia,
-                deudasDia.Count,
+                totalDeudasDia.Count,
                 pagosDia.Count,
-                deudasDia.Sum(d => d.Monto),
-                pagosDia.Sum(p => p.Monto)
+                totalDeudasDia.Sum(d => d.Monto),
+                pagosDia.Sum(p => p.Monto),
+                vencenDia.Count,
+                vencenDia.Sum(d => d.Monto)
             ));
         }
 

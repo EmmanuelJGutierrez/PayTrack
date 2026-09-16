@@ -81,6 +81,8 @@ export interface DiaCalendario {
   cantidadPagos: number;
   montoDeudas: number;
   montoPagado: number;
+  cantidadVencimientos?: number;
+  montoVencimientos?: number;
 }
 
 export interface CalendarioMensualResponse {
@@ -102,6 +104,8 @@ export interface DetalleDiaMovimiento {
   referencia?: string;
   fecha: string;
   activo: boolean;
+  esVencimiento?: boolean;
+  fechaVencimiento?: string;
 }
 
 export interface DetalleDiaResponse {
@@ -110,6 +114,7 @@ export interface DetalleDiaResponse {
   dia: number;
   totalDeudas: number;
   totalPagos: number;
+  cantidadVencimientos?: number;
   movimientos: DetalleDiaMovimiento[];
 }
 

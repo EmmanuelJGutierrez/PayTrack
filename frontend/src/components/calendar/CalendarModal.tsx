@@ -40,7 +40,9 @@ export const CalendarModal: React.FC<Props> = ({
       fetchCalendarioMensual(anio, mes)
         .then(res => {
           setDias(res.dias);
-          const primerDiaConActividad = res.dias.find(d => d.cantidadDeudas > 0 || d.cantidadPagos > 0);
+          const primerDiaConActividad = res.dias.find(
+            d => d.cantidadDeudas > 0 || d.cantidadPagos > 0 || (d.cantidadVencimientos ?? 0) > 0
+          );
           if (primerDiaConActividad) {
             setDiaSeleccionado(primerDiaConActividad.dia);
           } else {
@@ -72,23 +74,24 @@ export const CalendarModal: React.FC<Props> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`Calendario de Movimientos — ${nombreMes} ${anio}`}
-      maxWidth="920px"
+      maxWidth="880px"
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Barra superior de navegación de mes */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: '#fafaf9',
-            padding: '12px 18px',
-            borderRadius: '12px',
+            padding: '8px 14px',
+            borderRadius: '10px',
             border: '1px solid #e5e7eb'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <CalendarIcon size={20} color="#2563eb" />
-            <span style={{ fontSize: '18px', fontWeight: 800, color: '#1f2937' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CalendarIcon size={18} color="#2563eb" />
+            <span style={{ fontSize: '16px', fontWeight: 800, color: '#1f2937' }}>
               {nombreMes} <span style={{ color: '#2563eb' }}>{anio}</span>
             </span>
           </div>
@@ -97,7 +100,7 @@ export const CalendarModal: React.FC<Props> = ({
             <button
               onClick={onPrevMonth}
               style={{
-                padding: '8px 14px',
+                padding: '6px 12px',
                 borderRadius: '8px',
                 backgroundColor: '#ffffff',
                 border: '1px solid #d1d5db',
@@ -105,16 +108,17 @@ export const CalendarModal: React.FC<Props> = ({
                 alignItems: 'center',
                 gap: '4px',
                 fontWeight: 600,
-                fontSize: '13px',
-                color: '#374151'
+                fontSize: '12px',
+                color: '#374151',
+                cursor: 'pointer'
               }}
             >
-              <ChevronLeft size={16} /> Mes anterior
+              <ChevronLeft size={14} /> Mes anterior
             </button>
             <button
               onClick={onNextMonth}
               style={{
-                padding: '8px 14px',
+                padding: '6px 12px',
                 borderRadius: '8px',
                 backgroundColor: '#ffffff',
                 border: '1px solid #d1d5db',
@@ -122,27 +126,30 @@ export const CalendarModal: React.FC<Props> = ({
                 alignItems: 'center',
                 gap: '4px',
                 fontWeight: 600,
-                fontSize: '13px',
-                color: '#374151'
+                fontSize: '12px',
+                color: '#374151',
+                cursor: 'pointer'
               }}
             >
-              Mes siguiente <ChevronRight size={16} />
+              Mes siguiente <ChevronRight size={14} />
             </button>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '20px' }}>
+        {/* Grilla y Panel de detalle */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: '14px', alignItems: 'start' }}>
+          {/* Calendario mensual */}
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '6px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
               {DIAS_SEMANA.map(d => (
                 <div
                   key={d}
                   style={{
                     textAlign: 'center',
-                    fontSize: '12px',
+                    fontSize: '11px',
                     fontWeight: 700,
                     color: '#6b7280',
-                    padding: '4px 0',
+                    padding: '2px 0',
                     textTransform: 'uppercase'
                   }}
                 >
@@ -152,34 +159,41 @@ export const CalendarModal: React.FC<Props> = ({
             </div>
 
             {loading ? (
-              <p style={{ textAlign: 'center', padding: '32px', color: '#9ca3af' }}>Cargando días del mes...</p>
+              <p style={{ textAlign: 'center', padding: '32px', color: '#9ca3af', fontSize: '14px' }}>
+                Cargando días del mes...
+              </p>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
                 {Array.from({ length: offsetInicial }).map((_, i) => (
-                  <div key={`empty-${i}`} style={{ height: '70px' }} />
+                  <div key={`empty-${i}`} style={{ height: '56px' }} />
                 ))}
 
                 {dias.map(d => {
                   const isSelected = d.dia === diaSeleccionado;
                   const tienePagos = d.cantidadPagos > 0;
-                  const tieneDeudas = d.cantidadDeudas > 0;
-                  const tieneActividad = tienePagos || tieneDeudas;
+                  const tieneVencimientos = (d.cantidadVencimientos ?? 0) > 0;
+                  const tieneDeudasEmitidas = (d.cantidadDeudas - (d.cantidadVencimientos ?? 0)) > 0;
+                  const tieneActividad = tienePagos || tieneDeudasEmitidas || tieneVencimientos;
 
                   return (
                     <div
                       key={d.dia}
                       onClick={() => setDiaSeleccionado(d.dia)}
                       style={{
-                        height: '74px',
-                        padding: '6px 8px',
-                        borderRadius: '10px',
+                        height: '56px',
+                        padding: '4px 6px',
+                        borderRadius: '8px',
                         border: isSelected
                           ? '2px solid #2563eb'
+                          : tieneVencimientos
+                          ? '1.5px solid #fcd34d'
                           : tieneActividad
                           ? '1.5px solid #d1d5db'
-                          : '1px solid #f3f4f6',
+                          : '1px solid #f1f5f9',
                         backgroundColor: isSelected
                           ? '#eff6ff'
+                          : tieneVencimientos
+                          ? '#fffbeb'
                           : tieneActividad
                           ? '#ffffff'
                           : '#fafaf9',
@@ -194,9 +208,9 @@ export const CalendarModal: React.FC<Props> = ({
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span
                           style={{
-                            fontSize: '13px',
+                            fontSize: '12px',
                             fontWeight: isSelected || tieneActividad ? 800 : 600,
-                            color: isSelected ? '#1e40af' : tieneActividad ? '#111827' : '#9ca3af'
+                            color: isSelected ? '#1e40af' : tieneVencimientos ? '#b45309' : tieneActividad ? '#111827' : '#9ca3af'
                           }}
                         >
                           {d.dia}
@@ -207,39 +221,50 @@ export const CalendarModal: React.FC<Props> = ({
                             {tienePagos && (
                               <span
                                 style={{
-                                  width: '7px',
-                                  height: '7px',
+                                  width: '6px',
+                                  height: '6px',
                                   borderRadius: '50%',
                                   backgroundColor: '#16a34a'
                                 }}
                                 title={`${d.cantidadPagos} pago(s)`}
                               />
                             )}
-                            {tieneDeudas && (
+                            {tieneVencimientos && (
                               <span
                                 style={{
-                                  width: '7px',
-                                  height: '7px',
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#d97706'
+                                }}
+                                title={`${d.cantidadVencimientos} vencimiento(s)`}
+                              />
+                            )}
+                            {tieneDeudasEmitidas && (
+                              <span
+                                style={{
+                                  width: '6px',
+                                  height: '6px',
                                   borderRadius: '50%',
                                   backgroundColor: '#dc2626'
                                 }}
-                                title={`${d.cantidadDeudas} deuda(s)`}
+                                title="Deuda emitida"
                               />
                             )}
                           </div>
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
                         {tienePagos && (
                           <span
                             style={{
-                              fontSize: '10px',
+                              fontSize: '9px',
                               fontWeight: 700,
                               color: '#15803d',
                               backgroundColor: '#dcfce7',
-                              padding: '1px 4px',
-                              borderRadius: '4px',
+                              padding: '1px 3px',
+                              borderRadius: '3px',
                               whiteSpace: 'nowrap',
                               textOverflow: 'ellipsis',
                               overflow: 'hidden'
@@ -249,15 +274,33 @@ export const CalendarModal: React.FC<Props> = ({
                           </span>
                         )}
 
-                        {tieneDeudas && (
+                        {tieneVencimientos ? (
                           <span
                             style={{
-                              fontSize: '10px',
+                              fontSize: '9px',
+                              fontWeight: 700,
+                              color: '#92400e',
+                              backgroundColor: '#fef3c7',
+                              border: '1px solid #fde68a',
+                              padding: '0 3px',
+                              borderRadius: '3px',
+                              whiteSpace: 'nowrap',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden'
+                            }}
+                            title={`Vence: $${Math.round(d.montoVencimientos ?? d.montoDeudas).toLocaleString()}`}
+                          >
+                            ⏰${Math.round(d.montoVencimientos ?? d.montoDeudas).toLocaleString()}
+                          </span>
+                        ) : tieneDeudasEmitidas ? (
+                          <span
+                            style={{
+                              fontSize: '9px',
                               fontWeight: 700,
                               color: '#b91c1c',
                               backgroundColor: '#fee2e2',
-                              padding: '1px 4px',
-                              borderRadius: '4px',
+                              padding: '1px 3px',
+                              borderRadius: '3px',
                               whiteSpace: 'nowrap',
                               textOverflow: 'ellipsis',
                               overflow: 'hidden'
@@ -265,7 +308,7 @@ export const CalendarModal: React.FC<Props> = ({
                           >
                             +${Math.round(d.montoDeudas).toLocaleString()}
                           </span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   );
@@ -274,23 +317,26 @@ export const CalendarModal: React.FC<Props> = ({
             )}
           </div>
 
+          {/* Panel Lateral: Detalle del día seleccionado */}
           <div
             style={{
               backgroundColor: '#f8fafc',
               border: '1.5px solid #e2e8f0',
               borderRadius: '12px',
-              padding: '18px',
+              padding: '14px',
               display: 'flex',
               flexDirection: 'column',
-              maxHeight: '440px'
+              height: '370px'
             }}
           >
             {diaSeleccionado === null ? (
-              <p style={{ color: '#9ca3af', textAlign: 'center', margin: 'auto' }}>
+              <p style={{ color: '#9ca3af', textAlign: 'center', margin: 'auto', fontSize: '13px' }}>
                 Selecciona un día en el calendario para ver sus movimientos.
               </p>
             ) : loadingDetalle ? (
-              <p style={{ color: '#6b7280', textAlign: 'center', margin: 'auto' }}>Cargando detalle...</p>
+              <p style={{ color: '#6b7280', textAlign: 'center', margin: 'auto', fontSize: '13px' }}>
+                Cargando detalle...
+              </p>
             ) : !detalleDia || detalleDia.movimientos.length === 0 ? (
               <div style={{ textAlign: 'center', margin: 'auto', color: '#64748b' }}>
                 <p style={{ fontSize: '15px', fontWeight: 700, color: '#1e293b' }}>
@@ -300,70 +346,92 @@ export const CalendarModal: React.FC<Props> = ({
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
+                {/* Cabecera del día */}
+                <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '10px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
                     {diaSeleccionado} de {nombreMes} {anio}
                   </span>
 
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
                     {detalleDia.totalPagos > 0 && (
                       <span
                         style={{
-                          fontSize: '12px',
+                          fontSize: '11px',
                           fontWeight: 700,
                           color: '#15803d',
                           backgroundColor: '#dcfce7',
-                          padding: '2px 8px',
-                          borderRadius: '6px',
+                          padding: '2px 7px',
+                          borderRadius: '5px',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '3px'
                         }}
                       >
-                        <ArrowDownRight size={13} /> Pagos: ${detalleDia.totalPagos.toLocaleString()}
+                        <ArrowDownRight size={12} /> Pagos: ${detalleDia.totalPagos.toLocaleString()}
                       </span>
                     )}
 
-                    {detalleDia.totalDeudas > 0 && (
+                    {(detalleDia.cantidadVencimientos ?? 0) > 0 && (
                       <span
                         style={{
-                          fontSize: '12px',
+                          fontSize: '11px',
                           fontWeight: 700,
-                          color: '#b91c1c',
-                          backgroundColor: '#fee2e2',
-                          padding: '2px 8px',
-                          borderRadius: '6px',
+                          color: '#92400e',
+                          backgroundColor: '#fef3c7',
+                          border: '1px solid #fde68a',
+                          padding: '2px 7px',
+                          borderRadius: '5px',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '3px'
                         }}
                       >
-                        <ArrowUpRight size={13} /> Deudas: ${detalleDia.totalDeudas.toLocaleString()}
+                        <Clock size={12} /> Vence: ${detalleDia.totalDeudas.toLocaleString()}
+                      </span>
+                    )}
+
+                    {detalleDia.totalDeudas > 0 && (detalleDia.cantidadVencimientos ?? 0) === 0 && (
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#b91c1c',
+                          backgroundColor: '#fee2e2',
+                          padding: '2px 7px',
+                          borderRadius: '5px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px'
+                        }}
+                      >
+                        <ArrowUpRight size={12} /> Deudas: ${detalleDia.totalDeudas.toLocaleString()}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Lista de movimientos */}
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '2px' }}>
                   {detalleDia.movimientos.map(mov => {
                     const isPago = mov.tipoMovimiento === 'Pago';
+                    const isVencimiento = mov.esVencimiento;
 
                     return (
                       <div
-                        key={`${mov.tipoMovimiento}-${mov.id}`}
+                        key={`${mov.tipoMovimiento}-${mov.id}-${isVencimiento ? 'venc' : 'mov'}`}
                         style={{
                           backgroundColor: '#ffffff',
-                          padding: '10px 12px',
+                          padding: '9px 11px',
                           borderRadius: '8px',
-                          border: '1px solid #e2e8f0',
+                          border: isVencimiento ? '1px solid #fde68a' : '1px solid #e2e8f0',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           gap: '8px'
                         }}
                       >
-                        <div style={{ overflow: 'hidden' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ overflow: 'hidden', minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                             <span
                               style={{
                                 fontWeight: 700,
@@ -386,6 +454,24 @@ export const CalendarModal: React.FC<Props> = ({
                             {mov.tipoComprobante && (
                               <ComprobanteBadge tipo={mov.tipoComprobante as any} numero={mov.numeroComprobante} />
                             )}
+
+                            {isVencimiento && (
+                              <span
+                                style={{
+                                  fontSize: '10px',
+                                  fontWeight: 700,
+                                  color: '#b45309',
+                                  backgroundColor: '#fef3c7',
+                                  padding: '1px 5px',
+                                  borderRadius: '4px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px'
+                                }}
+                              >
+                                <Clock size={10} /> Vence hoy
+                              </span>
+                            )}
                           </div>
 
                           <p style={{ fontSize: '12px', color: '#475569', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -393,24 +479,32 @@ export const CalendarModal: React.FC<Props> = ({
                           </p>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
-                            <Clock size={11} />
-                            <span>
-                              {new Date(mov.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                            {isVencimiento ? (
+                              <span style={{ color: '#b45309', fontWeight: 600 }}>
+                                Vencimiento de deuda
+                              </span>
+                            ) : (
+                              <>
+                                <Clock size={11} />
+                                <span>
+                                  {new Date(mov.fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </>
+                            )}
                             {mov.medioPago && <span>· {mov.medioPago}</span>}
                             {mov.referencia && <span>· Ref: {mov.referencia}</span>}
                           </div>
                         </div>
 
-                        <div style={{ textAlign: 'right' }}>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
                           <span
                             style={{
                               fontSize: '14px',
                               fontWeight: 800,
-                              color: isPago ? '#16a34a' : '#dc2626'
+                              color: isPago ? '#16a34a' : isVencimiento ? '#b45309' : '#dc2626'
                             }}
                           >
-                            {isPago ? `-$${mov.monto.toLocaleString()}` : `+$${mov.monto.toLocaleString()}`}
+                            {isPago ? `-$${mov.monto.toLocaleString()}` : isVencimiento ? `$${mov.monto.toLocaleString()}` : `+$${mov.monto.toLocaleString()}`}
                           </span>
                         </div>
                       </div>

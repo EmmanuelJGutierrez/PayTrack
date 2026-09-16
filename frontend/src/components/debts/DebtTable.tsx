@@ -466,7 +466,7 @@ export const DebtTable: React.FC<Props> = ({
                 {isExpanded && (
                   <div
                     style={{
-                      padding: '14px 24px 16px 54px',
+                      padding: '12px 24px 14px 54px',
                       backgroundColor: '#fafaf9',
                       borderTop: '1px dashed #e5e0d8',
                       fontSize: '13px',
@@ -474,16 +474,15 @@ export const DebtTable: React.FC<Props> = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      flexWrap: 'wrap',
                       gap: '16px'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
                       <div>
                         <strong>Fecha emisión:</strong> {new Date(d.fechaDeuda).toLocaleDateString()}
                       </div>
                       {d.fechaVencimiento && (
-                        <div>
+                        <div style={{ color: '#b45309', fontWeight: 600 }}>
                           <strong>Vencimiento:</strong> {new Date(d.fechaVencimiento).toLocaleDateString()}
                         </div>
                       )}
@@ -500,6 +499,8 @@ export const DebtTable: React.FC<Props> = ({
                     <button
                       onClick={() => setDeudaToDelete(d)}
                       style={{
+                        flexShrink: 0,
+                        marginLeft: 'auto',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
@@ -510,8 +511,11 @@ export const DebtTable: React.FC<Props> = ({
                         borderRadius: '6px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
                       }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#fecdd3')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#fee2e2')}
                       title="Eliminar este comprobante"
                     >
                       <Trash2 size={13} />
