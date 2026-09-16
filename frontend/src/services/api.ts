@@ -4,7 +4,9 @@
   ResumenMensual,
   MovimientoHistorial,
   CalendarioMensualResponse,
-  DetalleDiaResponse
+  DetalleDiaResponse,
+  BackupInfo,
+  RestoreResponse
 } from '../types';
 
 // Usar proxy relativo /api (enrutado a http://localhost:5177 por Vite o Tauri)
@@ -116,4 +118,29 @@ export async function fetchDetalleDia(anio: number, mes: number, dia: number): P
   const res = await fetch(`${API_BASE}/calendario/${anio}/${mes}/${dia}`);
   if (!res.ok) throw new Error(`Error al cargar detalle del día ${dia}`);
   return res.json();
+}
+
+// Servicios de Copia de Seguridad y Restauración (HU-20)
+export async function fetchBackupInfo(): Promise<BackupInfo> {
+  const res = await fetch(`${API_BASE}/backup/info`);
+  if (!res.ok) throw new Error('Error al obtener información de la base de datos');
+  return res.json();
+}
+
+export function getBackupDownloadUrl(): string {
+  return `${API_BASE}/backup/descargar`;
+}
+
+export async function restoreBackup(file: File): Promise<RestoreResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_BASE}/backup/restaurar`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || 'Error al restaurar la copia de seguridad');
+  return body;
 }

@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle, FileSpreadsheet } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle, FileSpreadsheet, ShieldCheck } from 'lucide-react';
 
 interface Props {
   anio: number;
@@ -10,6 +10,7 @@ interface Props {
   onOpenNewProvider: () => void;
   onOpenMonthlySummary: () => void;
   onOpenHelp: () => void;
+  onOpenBackup?: () => void;
   onExportPlanilla?: () => void;
 }
 
@@ -27,6 +28,7 @@ export const Header: React.FC<Props> = ({
   onOpenNewProvider,
   onOpenMonthlySummary,
   onOpenHelp,
+  onOpenBackup,
   onExportPlanilla
 }) => {
   const nombreMes = NOMBRES_MESES[mes - 1] || 'Mes';
@@ -137,6 +139,32 @@ export const Header: React.FC<Props> = ({
           >
             <FileSpreadsheet size={16} color="#15803d" />
             <span>Exportar Planilla</span>
+          </button>
+        )}
+
+        {onOpenBackup && (
+          <button
+            onClick={onOpenBackup}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 14px',
+              backgroundColor: '#f8fafc',
+              color: '#334155',
+              borderRadius: '10px',
+              border: '1.5px solid #cbd5e1',
+              fontWeight: 600,
+              fontSize: '13px',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8fafc')}
+            title="Guardar o restaurar copias de seguridad de la base de datos (HU-20)"
+          >
+            <ShieldCheck size={16} color="#2563eb" />
+            <span>Respaldo</span>
           </button>
         )}
 

@@ -108,3 +108,20 @@ export interface DetalleDiaResponse {
   totalPagos: number;
   movimientos: DetalleDiaMovimiento[];
 }
+
+export interface BackupInfo {
+  databasePath: string;
+  tamanoBytes: number;
+  tamanoFormateado: string;
+  ultimaModificacion: string;
+  totalProveedores: number;
+  totalDeudas: number;
+  totalPagos: number;
+}
+
+export interface RestoreResponse {
+  message: string;
+  totalProveedores: number;
+  totalDeudas: number;
+  totalPagos: number;
+}

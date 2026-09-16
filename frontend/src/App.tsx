@@ -7,6 +7,7 @@ import { AddDebtModal } from './components/modals/AddDebtModal';
 import { AddPaymentModal } from './components/modals/AddPaymentModal';
 import { HistoryModal } from './components/modals/HistoryModal';
 import { MonthlySummaryModal } from './components/modals/MonthlySummaryModal';
+import { BackupModal } from './components/modals/BackupModal';
 import { HelpModal } from './components/modals/HelpModal';
 import { CalendarModal } from './components/calendar/CalendarModal';
 import { fetchProveedores, fetchDeudas } from './services/api';
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isMonthlySummaryOpen, setIsMonthlySummaryOpen] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Deuda puntual para registrar pago
@@ -154,6 +156,7 @@ export const App: React.FC = () => {
         onOpenNewProvider={() => setIsAddProviderOpen(true)}
         onOpenMonthlySummary={() => setIsMonthlySummaryOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
+        onOpenBackup={() => setIsBackupOpen(true)}
         onExportPlanilla={handleExportPlanilla}
       />
 
@@ -250,6 +253,12 @@ export const App: React.FC = () => {
         anio={anio}
         mes={mes}
         nombreMes={NOMBRES_MESES[mes - 1]}
+      />
+
+      <BackupModal
+        isOpen={isBackupOpen}
+        onClose={() => setIsBackupOpen(false)}
+        onSuccess={handleDataChanged}
       />
 
       <HelpModal
