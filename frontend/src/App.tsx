@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
@@ -8,6 +8,7 @@ import { AddPaymentModal } from './components/modals/AddPaymentModal';
 import { HistoryModal } from './components/modals/HistoryModal';
 import { MonthlySummaryModal } from './components/modals/MonthlySummaryModal';
 import { HelpModal } from './components/modals/HelpModal';
+import { CalendarModal } from './components/calendar/CalendarModal';
 import { fetchProveedores, fetchDeudas } from './services/api';
 import type { ProveedorResumen, DeudaResumen } from './types';
 
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   // Modales
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isAddProviderOpen, setIsAddProviderOpen] = useState(false);
   const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
@@ -44,12 +46,10 @@ export const App: React.FC = () => {
       setProveedores(data);
 
       if (data.length > 0) {
-        // Si no hay seleccionado o el seleccionado ya no existe, elegimos el primero
         setSelectedProviderId(prev => {
           if (prev !== null && data.some(p => p.id === prev)) {
             return prev;
           }
-          // Priorizamos seleccionar "Servicios Gamma Corp." si existe (como en Figma)
           const gamma = data.find(p => p.nombre.includes('Gamma'));
           return gamma ? gamma.id : data[0].id;
         });
@@ -124,6 +124,7 @@ export const App: React.FC = () => {
         mes={mes}
         onPrevMonth={handlePrevMonth}
         onNextMonth={handleNextMonth}
+        onOpenCalendar={() => setIsCalendarOpen(true)}
         onOpenNewProvider={() => setIsAddProviderOpen(true)}
         onOpenMonthlySummary={() => setIsMonthlySummaryOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
@@ -166,6 +167,17 @@ export const App: React.FC = () => {
       </div>
 
       {/* Modales */}
+      <CalendarModal
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        anio={anio}
+        mes={mes}
+        onPrevMonth={handlePrevMonth}
+        onNextMonth={handleNextMonth}
+        nombreMes={NOMBRES_MESES[mes - 1]}
+        onSelectProveedor={(provId) => setSelectedProviderId(provId)}
+      />
+
       <AddProviderModal
         isOpen={isAddProviderOpen}
         onClose={() => setIsAddProviderOpen(false)}

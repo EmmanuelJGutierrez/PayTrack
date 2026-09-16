@@ -1,4 +1,11 @@
-import type { ProveedorResumen, DeudaResumen, ResumenMensual, MovimientoHistorial } from '../types';
+﻿import type {
+  ProveedorResumen,
+  DeudaResumen,
+  ResumenMensual,
+  MovimientoHistorial,
+  CalendarioMensualResponse,
+  DetalleDiaResponse
+} from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5177/api';
 
@@ -77,5 +84,18 @@ export async function fetchResumenMensual(anio: number, mes: number): Promise<Re
 export async function fetchHistorial(proveedorId: number): Promise<MovimientoHistorial[]> {
   const res = await fetch(`${API_BASE}/proveedores/${proveedorId}/historial`);
   if (!res.ok) throw new Error('Error al cargar historial');
+  return res.json();
+}
+
+export async function fetchCalendarioMensual(anio: number, mes: number, tzOffset?: number): Promise<CalendarioMensualResponse> {
+  const offset = tzOffset !== undefined ? tzOffset : -new Date().getTimezoneOffset();
+  const res = await fetch(`${API_BASE}/calendario?anio=${anio}&mes=${mes}&tzOffset=${offset}`);
+  if (!res.ok) throw new Error('Error al cargar calendario mensual');
+  return res.json();
+}
+
+export async function fetchDetalleDia(anio: number, mes: number, dia: number): Promise<DetalleDiaResponse> {
+  const res = await fetch(`${API_BASE}/calendario/${anio}/${mes}/${dia}`);
+  if (!res.ok) throw new Error(`Error al cargar detalle del día ${dia}`);
   return res.json();
 }

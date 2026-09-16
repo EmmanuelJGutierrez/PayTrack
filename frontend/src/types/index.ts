@@ -1,4 +1,4 @@
-export interface ProveedorResumen {
+﻿export interface ProveedorResumen {
   id: number;
   nombre: string;
   contacto?: string;
@@ -49,4 +49,42 @@ export interface MovimientoHistorial {
   referencia?: string;
   fecha: string;
   activo: boolean;
+}
+
+export interface DiaCalendario {
+  dia: number;
+  cantidadDeudas: number;
+  cantidadPagos: number;
+  montoDeudas: number;
+  montoPagado: number;
+}
+
+export interface CalendarioMensualResponse {
+  anio: number;
+  mes: number;
+  dias: DiaCalendario[];
+}
+
+export interface DetalleDiaMovimiento {
+  tipoMovimiento: 'Deuda' | 'Pago';
+  id: number;
+  proveedorId: number;
+  proveedorNombre: string;
+  monto: number;
+  concepto: string;
+  tipoComprobante?: 'Remito' | 'Factura';
+  numeroComprobante?: string;
+  medioPago?: string;
+  referencia?: string;
+  fecha: string;
+  activo: boolean;
+}
+
+export interface DetalleDiaResponse {
+  anio: number;
+  mes: number;
+  dia: number;
+  totalDeudas: number;
+  totalPagos: number;
+  movimientos: DetalleDiaMovimiento[];
 }

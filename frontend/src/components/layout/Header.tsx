@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle } from 'lucide-react';
 
 interface Props {
@@ -6,6 +6,7 @@ interface Props {
   mes: number;
   onPrevMonth: () => void;
   onNextMonth: () => void;
+  onOpenCalendar: () => void;
   onOpenNewProvider: () => void;
   onOpenMonthlySummary: () => void;
   onOpenHelp: () => void;
@@ -21,6 +22,7 @@ export const Header: React.FC<Props> = ({
   mes,
   onPrevMonth,
   onNextMonth,
+  onOpenCalendar,
   onOpenNewProvider,
   onOpenMonthlySummary,
   onOpenHelp
@@ -42,9 +44,10 @@ export const Header: React.FC<Props> = ({
         zIndex: 100
       }}
     >
-      {/* Selector de Mes Central / Izquierda según Figma */}
+      {/* Selector de Mes con acceso directo al Calendario */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div
+        <button
+          onClick={onOpenCalendar}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -52,14 +55,20 @@ export const Header: React.FC<Props> = ({
             backgroundColor: '#f8fafc',
             padding: '8px 16px',
             borderRadius: '12px',
-            border: '1px solid #e2e8f0'
+            border: '1.5px solid #cbd5e1',
+            cursor: 'pointer',
+            transition: 'background-color 0.15s ease'
           }}
+          title="Hacer clic para abrir la vista de Calendario mensual"
         >
           <Calendar size={20} color="#2563eb" />
           <span style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.02em' }}>
             {nombreMes} <span style={{ color: '#2563eb' }}>{anio}</span>
           </span>
-        </div>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', backgroundColor: '#e2e8f0', padding: '2px 6px', borderRadius: '4px', marginLeft: '4px' }}>
+            Ver Calendario 📅
+          </span>
+        </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button
