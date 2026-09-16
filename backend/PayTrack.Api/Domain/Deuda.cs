@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace PayTrack.Api.Models;
+namespace PayTrack.Api.Domain;
 
 public enum TipoComprobante
 {

@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using PayTrack.Api.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PayTrack.Api.Domain;
 
 namespace PayTrack.Api.Data;
 

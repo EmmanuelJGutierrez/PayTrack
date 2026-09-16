@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace PayTrack.Api.Models;
+namespace PayTrack.Api.Domain;
 
 public enum MedioPago
 {
