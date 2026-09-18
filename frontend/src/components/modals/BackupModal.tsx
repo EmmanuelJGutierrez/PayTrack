@@ -67,7 +67,7 @@ export const BackupModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
 
     const confirmMsg =
       `¿Confirmás que deseás restaurar la copia "${selectedFile.name}"?\n\n` +
-      `⚠️ ATENCIÓN: Todos los datos actuales serán reemplazados por los de esta copia de seguridad.`;
+      ` ATENCIÓN: Todos los datos actuales serán reemplazados por los de esta copia de seguridad.`;
 
     if (!window.confirm(confirmMsg)) return;
 

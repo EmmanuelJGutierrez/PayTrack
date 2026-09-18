@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -16,6 +16,7 @@ export const ModalWrapper: React.FC<Props> = ({
   children,
   maxWidth = '540px'
 }) => {
+  const isMouseDownOnBackdrop = useRef(false);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -27,6 +28,17 @@ export const ModalWrapper: React.FC<Props> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const handleBackdropMouseDown = (e: React.MouseEvent) => {
+    isMouseDownOnBackdrop.current = (e.target === e.currentTarget);
+  };
+
+  const handleBackdropMouseUp = (e: React.MouseEvent) => {
+    if (isMouseDownOnBackdrop.current && e.target === e.currentTarget) {
+      onClose();
+    }
+    isMouseDownOnBackdrop.current = false;
+  };
 
   return (
     <div
@@ -41,7 +53,8 @@ export const ModalWrapper: React.FC<Props> = ({
         zIndex: 9999,
         padding: '16px'
       }}
-      onClick={onClose}
+      onMouseDown={handleBackdropMouseDown}
+      onMouseUp={handleBackdropMouseUp}
     >
       <div
         style={{

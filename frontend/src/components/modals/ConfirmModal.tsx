@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useRef } from 'react';
 import { AlertTriangle, Trash2, RotateCcw, X } from 'lucide-react';
 
 interface Props {
@@ -60,6 +60,18 @@ export const ConfirmModal: React.FC<Props> = ({
   };
 
   const { icon, iconBg, btnBg } = getVariantStyles();
+  const isMouseDownOnBackdrop = useRef(false);
+
+  const handleBackdropMouseDown = (e: React.MouseEvent) => {
+    isMouseDownOnBackdrop.current = (e.target === e.currentTarget);
+  };
+
+  const handleBackdropMouseUp = (e: React.MouseEvent) => {
+    if (isMouseDownOnBackdrop.current && e.target === e.currentTarget) {
+      onClose();
+    }
+    isMouseDownOnBackdrop.current = false;
+  };
 
   return (
     <div
@@ -74,7 +86,8 @@ export const ConfirmModal: React.FC<Props> = ({
         zIndex: 10000,
         padding: '16px'
       }}
-      onClick={onClose}
+      onMouseDown={handleBackdropMouseDown}
+      onMouseUp={handleBackdropMouseUp}
     >
       <div
         style={{

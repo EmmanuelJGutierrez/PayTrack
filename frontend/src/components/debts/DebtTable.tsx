@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import {
   Plus,
+  Check,
   History,
   DollarSign,
   ChevronDown,
@@ -73,7 +74,7 @@ export const DebtTable: React.FC<Props> = ({
             borderRadius: '5px'
           }}
         >
-          ✓ Saldado
+          <Check size={12} style={{ strokeWidth: 3 }} /> Saldado
         </span>
       );
     }
@@ -153,8 +154,18 @@ export const DebtTable: React.FC<Props> = ({
 
   return (
     <div style={{ flex: 1, padding: '28px 36px', overflowY: 'auto' }}>
-      {/* Encabezado del Proveedor Seleccionado */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+      {/* Encabezado del Proveedor Seleccionado (Card con elevación) */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        marginBottom: '24px',
+        backgroundColor: '#ffffff',
+        padding: '24px 28px',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px -4px rgba(15, 23, 42, 0.04)'
+      }}>
         {/* Fila 1: Título a la izquierda y Botones de Acción fijados siempre arriba a la derecha */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
@@ -192,8 +203,8 @@ export const DebtTable: React.FC<Props> = ({
               style={{
                 padding: '10px 18px',
                 borderRadius: '10px',
-                backgroundColor: '#2563eb',
-                boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
+                backgroundColor: '#0f5132',
+                boxShadow: '0 2px 4px rgba(15, 81, 50, 0.25)',
                 color: '#ffffff',
                 fontWeight: 700,
                 fontSize: '14px',
@@ -206,7 +217,7 @@ export const DebtTable: React.FC<Props> = ({
               }}
             >
               <Plus size={17} />
-              <span>+ Deuda</span>
+              <span>Deuda</span>
             </button>
           </div>
         </div>
@@ -382,10 +393,13 @@ export const DebtTable: React.FC<Props> = ({
                       >
                         <div
                           style={{
-                            width: `${d.porcentajeSaldado}%`,
+                            width: `${Math.min(100, Math.max(0, d.porcentajeSaldado))}%`,
                             height: '100%',
-                            backgroundColor: d.porcentajeSaldado >= 100 ? '#10b981' : d.porcentajeSaldado >= 50 ? '#f59e0b' : '#ef4444',
-                            borderRadius: '4px'
+                            background: d.porcentajeSaldado >= 100
+                              ? '#16a34a'
+                              : `linear-gradient(90deg, #38bdf8 0%, #10b981 ${Math.max(25, d.porcentajeSaldado)}%)`,
+                            borderRadius: '4px',
+                            transition: 'width 0.3s ease'
                           }}
                         />
                       </div>

@@ -36,14 +36,15 @@ export const Header: React.FC<Props> = ({
       style={{
         height: '70px',
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e5e0d8',
+        borderBottom: '1px solid #e2e8f0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 28px',
         position: 'sticky',
         top: 0,
-        zIndex: 100
+        zIndex: 100,
+        boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)'
       }}
     >
       {/* Selector de Mes con acceso directo al Calendario */}
@@ -53,22 +54,21 @@ export const Header: React.FC<Props> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#f8fafc',
-            padding: '8px 16px',
-            borderRadius: '12px',
-            border: '1.5px solid #cbd5e1',
+            gap: '10px',
+            backgroundColor: 'transparent',
+            padding: '6px 12px',
+            borderRadius: '10px',
+            border: 'none',
             cursor: 'pointer',
             transition: 'background-color 0.15s ease'
           }}
-          title="Hacer clic para abrir la vista de Calendario mensual"
+          onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+          onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+          title="Abrir vista de Calendario mensual"
         >
-          <Calendar size={20} color="#2563eb" />
-          <span style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.02em' }}>
-            {nombreMes} <span style={{ color: '#2563eb' }}>{anio}</span>
-          </span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', backgroundColor: '#e2e8f0', padding: '2px 6px', borderRadius: '4px', marginLeft: '4px' }}>
-            Ver Calendario 📅
+          <Calendar size={22} color="#0f5132" />
+          <span style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+            {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
           </span>
         </button>
 

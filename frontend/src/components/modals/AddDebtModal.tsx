@@ -113,7 +113,7 @@ export const AddDebtModal: React.FC<Props> = ({
                 transition: 'all 0.15s ease'
               }}
             >
-              📦 Remito
+              Remito
             </button>
 
             <button
@@ -131,7 +131,7 @@ export const AddDebtModal: React.FC<Props> = ({
                 transition: 'all 0.15s ease'
               }}
             >
-              📄 Factura
+              Factura
             </button>
           </div>
         </div>

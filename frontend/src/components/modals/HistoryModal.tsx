@@ -176,7 +176,7 @@ export const HistoryModal: React.FC<Props> = ({
               transition: 'all 0.15s ease'
             }}
           >
-            📦 Deudas ({deudasCount})
+            Deudas ({deudasCount})
           </button>
           <button
             type="button"
@@ -193,7 +193,7 @@ export const HistoryModal: React.FC<Props> = ({
               transition: 'all 0.15s ease'
             }}
           >
-            💳 Pagos ({pagosCount})
+            Pagos ({pagosCount})
           </button>
         </div>
       )}

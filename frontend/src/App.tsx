@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
@@ -142,7 +143,7 @@ export const App: React.FC = () => {
             borderBottom: '1.5px solid #f87171'
           }}
         >
-          ⚠️ {connectionError}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16} /> {connectionError}</span>
         </div>
       )}
 
@@ -170,7 +171,7 @@ export const App: React.FC = () => {
           onOpenNewProvider={() => setIsAddProviderOpen(true)}
         />
 
-        <main style={{ flex: 1, backgroundColor: '#f7f6f2', minHeight: 'calc(100vh - 70px)' }}>
+        <main style={{ flex: 1, backgroundColor: '#f4f7f5', zIndex: 10, minHeight: 'calc(100vh - 70px)' }}>
           {loading ? (
             <div style={{ padding: '48px', textAlign: 'center', color: '#6b7280' }}>
               Cargando información del sistema...

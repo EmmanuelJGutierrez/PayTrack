@@ -23,13 +23,15 @@ export const ProviderSidebar: React.FC<Props> = ({
     <aside
       style={{
         width: '320px',
-        backgroundColor: '#fbfaf8',
-        borderRight: '1px solid #e8e4dc',
+        backgroundColor: '#fbfcfb',
+        borderRight: '1px solid #e2e8f0',
         display: 'flex',
         flexDirection: 'column',
         height: 'calc(100vh - 70px)',
         position: 'sticky',
         top: '70px',
+        zIndex: 30,
+        boxShadow: '4px 0 24px -4px rgba(15, 23, 42, 0.05)',
         overflow: 'hidden'
       }}
     >
@@ -50,7 +52,7 @@ export const ProviderSidebar: React.FC<Props> = ({
               alignItems: 'center',
               gap: '4px',
               padding: '5px 11px',
-              backgroundColor: '#16a34a',
+              backgroundColor: '#15803d',
               color: '#ffffff',
               borderRadius: '7px',
               border: 'none',
@@ -113,10 +115,10 @@ export const ProviderSidebar: React.FC<Props> = ({
                   padding: '12px 14px',
                   borderRadius: '10px',
                   cursor: 'pointer',
-                  backgroundColor: isSelected ? '#eef4fe' : 'transparent',
+                  backgroundColor: isSelected ? '#ecfdf5' : 'transparent',
                   marginBottom: '6px',
                   transition: 'background-color 0.15s ease',
-                  border: isSelected ? '1px solid #dbeafe' : '1px solid transparent'
+                  border: isSelected ? '1px solid #a7f3d0' : '1px solid transparent'
                 }}
               >
                 {/* Barra azul de selección a la izquierda */}
@@ -128,7 +130,7 @@ export const ProviderSidebar: React.FC<Props> = ({
                       top: '12px',
                       bottom: '12px',
                       width: '4px',
-                      backgroundColor: '#2563eb',
+                      backgroundColor: '#059669',
                       borderRadius: '0 4px 4px 0'
                     }}
                   />
