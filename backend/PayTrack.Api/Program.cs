@@ -59,11 +59,13 @@ var app = builder.Build();
 
 app.UseCors();
 
-// Inicialización de la base de datos y datos demostrativos
+// Inicialización de la base de datos (limpia por defecto para primer uso)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PayTrackDbContext>();
-    DbInitializer.Initialize(db);
+    var seedDemo = builder.Configuration.GetValue<bool>("SeedDemoData")
+                   || Environment.GetEnvironmentVariable("PAYTRACK_SEED_DEMO") == "true";
+    DbInitializer.Initialize(db, seedDemo);
 }
 
 // Health check

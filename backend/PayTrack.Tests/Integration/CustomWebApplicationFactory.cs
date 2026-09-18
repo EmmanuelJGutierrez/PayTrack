@@ -39,7 +39,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<PayTrackDbContext>();
-            DbInitializer.Initialize(db);
+            DbInitializer.Initialize(db, seedDemoData: true);
         });
     }
 

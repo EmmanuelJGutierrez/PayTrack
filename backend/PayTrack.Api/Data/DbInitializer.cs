@@ -7,7 +7,7 @@ namespace PayTrack.Api.Data;
 
 public static class DbInitializer
 {
-    public static void Initialize(PayTrackDbContext db)
+    public static void Initialize(PayTrackDbContext db, bool seedDemoData = false)
     {
         db.Database.EnsureCreated();
 
@@ -39,7 +39,7 @@ public static class DbInitializer
             db.SaveChanges();
         }
 
-        if (db.Proveedores.Any())
+        if (!seedDemoData || db.Proveedores.Any())
         {
             return;
         }

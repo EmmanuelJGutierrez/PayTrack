@@ -98,9 +98,31 @@ export const ProviderSidebar: React.FC<Props> = ({
       {/* Lista de Proveedores */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px' }}>
         {proveedores.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '24px 10px', color: '#9ca3af', fontSize: '13px' }}>
-            No se encontraron proveedores.
-          </p>
+          <div style={{ padding: '36px 14px', textAlign: 'center' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '10px',
+                backgroundColor: '#f1f5f3',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '12px',
+                color: '#15803d'
+              }}
+            >
+              <Building2 size={20} />
+            </div>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: '#374151', margin: '0 0 6px 0' }}>
+              {searchTerm ? 'Sin coincidencias' : 'Sin proveedores'}
+            </p>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+              {searchTerm
+                ? `No se encontraron resultados para "${searchTerm}".`
+                : 'Hacé clic en "Nuevo +" arriba para registrar la primera empresa.'}
+            </p>
+          </div>
         ) : (
           proveedores.map(p => {
             const isSelected = p.id === selectedId;

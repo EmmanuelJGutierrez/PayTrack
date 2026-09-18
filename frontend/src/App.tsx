@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Building2, Plus } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
@@ -56,8 +56,7 @@ export const App: React.FC = () => {
           if (prev !== null && data.some(p => p.id === prev)) {
             return prev;
           }
-          const gamma = data.find(p => p.nombre.includes('Gamma'));
-          return gamma ? gamma.id : data[0].id;
+          return data[0].id;
         });
       } else {
         setSelectedProviderId(null);
@@ -185,13 +184,123 @@ export const App: React.FC = () => {
               onOpenHistory={() => setIsHistoryOpen(true)}
               onDebtDeleted={handleDataChanged}
             />
+          ) : proveedores.length === 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 'calc(100vh - 120px)',
+                padding: '40px 24px'
+              }}
+            >
+              <div
+                style={{
+                  maxWidth: '520px',
+                  width: '100%',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  border: '1px solid #e2e8f0',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                  padding: '40px 32px',
+                  textAlign: 'center'
+                }}
+              >
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '16px',
+                    backgroundColor: '#ecfdf5',
+                    border: '1px solid #a7f3d0',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '20px',
+                    color: '#15803d',
+                    boxShadow: '0 4px 12px rgba(21, 128, 61, 0.12)'
+                  }}
+                >
+                  <Building2 size={32} />
+                </div>
+                
+                <h2
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    color: '#1e293b',
+                    marginBottom: '10px',
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  ¡Te damos la bienvenida a PayTrack!
+                </h2>
+                
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: '#64748b',
+                    lineHeight: '1.6',
+                    marginBottom: '24px'
+                  }}
+                >
+                  La aplicación está lista para su uso sin datos precargados. Para comenzar a gestionar comprobantes (facturas y remitos), vencimientos y pagos, registrá tu primer proveedor.
+                </p>
+
+                <button
+                  onClick={() => setIsAddProviderOpen(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 24px',
+                    backgroundColor: '#15803d',
+                    color: '#ffffff',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#166534')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#15803d')}
+                >
+                  <Plus size={18} />
+                  <span>Registrar Primer Proveedor</span>
+                </button>
+
+                <div
+                  style={{
+                    marginTop: '32px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid #f1f5f9',
+                    display: 'flex',
+                    justifyContent: 'space-around',
+                    fontSize: '12px',
+                    color: '#64748b'
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📅 Control mensual
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📑 Facturas y Remitos
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📊 Planillas Excel
+                  </span>
+                </div>
+              </div>
+            </div>
           ) : (
             <div style={{ padding: '60px 24px', textAlign: 'center', color: '#9ca3af' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#4b5563', marginBottom: '8px' }}>
-                No hay ningún proveedor seleccionado
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#4b5563', marginBottom: '8px' }}>
+                Seleccioná una empresa
               </h2>
-              <p style={{ fontSize: '15px' }}>
-                Hacé clic en "+ Nuevo Proveedor" en la barra lateral izquierda para dar de alta tu primera empresa.
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                Hacé clic en cualquier proveedor del menú lateral para consultar sus comprobantes y pagos.
               </p>
             </div>
           )}
