@@ -74,10 +74,23 @@ public class ListarProveedores : IEndpoint
         foreach (var p in proveedores)
         {
             var deudasActivas = p.Deudas.Where(d => d.Activo).ToList();
+
+            // Si se filtró por año y mes, filtramos las deudas activas con el ciclo de vida del mes
+            if (anio.HasValue && mes.HasValue)
+            {
+                deudasActivas = deudasActivas
+                    .Where(d => DeudaCicloVidaHelper.EstaVigenteEnMes(d, anio.Value, mes.Value))
+                    .ToList();
+            }
+
             var pagosActivos = p.Pagos.Where(pg => pg.Activo).ToList();
 
             var totalDeuda = deudasActivas.Sum(d => d.Monto);
-            var totalPagado = pagosActivos.Sum(pg => pg.Monto);
+            // Pagos imputados a las deudas vigentes de este proveedor
+            var totalPagado = deudasActivas.SelectMany(d => d.Pagos ?? Enumerable.Empty<PayTrack.Api.Domain.Pago>())
+                                           .Where(pg => pg.Activo)
+                                           .Sum(pg => pg.Monto);
+
             var saldoPendiente = Math.Max(0, totalDeuda - totalPagado);
 
             var pagadoEsteMes = pagosActivos
@@ -91,7 +104,7 @@ public class ListarProveedores : IEndpoint
 
             foreach (var d in deudasActivas)
             {
-                var pagosDeuda = d.Pagos.Where(pg => pg.Activo).Sum(pg => pg.Monto);
+                var pagosDeuda = (d.Pagos ?? Enumerable.Empty<PayTrack.Api.Domain.Pago>()).Where(pg => pg.Activo).Sum(pg => pg.Monto);
                 var saldoDeuda = Math.Max(0, d.Monto - pagosDeuda);
 
                 if (saldoDeuda > 0 && d.FechaVencimiento.HasValue)

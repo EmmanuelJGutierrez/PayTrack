@@ -299,13 +299,34 @@ export const DebtTable: React.FC<Props> = ({
 
         {/* Listado de Deudas */}
         {deudas.length === 0 ? (
-          <div style={{ padding: '48px 24px', textAlign: 'center', color: '#9ca3af' }}>
-            <p style={{ fontSize: '16px', fontWeight: 600, color: '#4b5563', marginBottom: '8px' }}>
-              No hay deudas registradas para este proveedor
+          <div style={{ padding: '52px 24px', textAlign: 'center', color: '#6b7280' }}>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+              No hay deudas vigentes en este mes
             </p>
-            <p style={{ fontSize: '14px' }}>
-              Hacé clic en "+ Cargar Deuda" arriba para registrar un comprobante (Remito o Factura).
+            <p style={{ fontSize: '14px', color: '#6b7280', maxWidth: '440px', margin: '0 auto 16px auto' }}>
+              Este proveedor no tiene comprobantes emitidos ni vencimientos pendientes en el mes seleccionado.
             </p>
+            <button
+              onClick={onOpenHistory}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: '#ffffff',
+                color: '#374151',
+                border: '1.5px solid #d1d5db',
+                fontWeight: 600,
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+            >
+              <History size={15} /> Ver historial completo de movimientos
+            </button>
           </div>
         ) : (
           deudas.map((d) => {

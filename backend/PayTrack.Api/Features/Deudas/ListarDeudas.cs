@@ -46,11 +46,18 @@ public class ListarDeudas : IEndpoint
         var m = mes ?? DateTime.Now.Month;
         var hoy = DateTime.UtcNow.Date;
 
-        var deudas = await db.Deudas
+        var deudasQuery = db.Deudas
             .Where(d => d.ProveedorId == id && d.Activo)
             .Include(d => d.Pagos)
-            .OrderByDescending(d => d.FechaDeuda)
-            .ToListAsync();
+            .OrderByDescending(d => d.FechaDeuda);
+
+        var deudas = await deudasQuery.ToListAsync();
+
+        // Si se especificó año y mes, filtramos las deudas por su ciclo de vida en ese mes
+        if (anio.HasValue && mes.HasValue)
+        {
+            deudas = deudas.Where(d => DeudaCicloVidaHelper.EstaVigenteEnMes(d, anio.Value, mes.Value)).ToList();
+        }
 
         var lista = new List<Response>();
 
