@@ -8,6 +8,7 @@ interface Props {
   onSelect: (id: number) => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
+  onOpenNewProvider: () => void;
 }
 
 export const ProviderSidebar: React.FC<Props> = ({
@@ -15,7 +16,8 @@ export const ProviderSidebar: React.FC<Props> = ({
   selectedId,
   onSelect,
   searchTerm,
-  onSearchChange
+  onSearchChange,
+  onOpenNewProvider
 }) => {
   return (
     <aside
@@ -32,12 +34,38 @@ export const ProviderSidebar: React.FC<Props> = ({
       }}
     >
       {/* Header Sección Empresas */}
-      <div style={{ padding: '20px 20px 12px', borderBottom: '1px solid #f1ede7' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#9ca3af', marginBottom: '12px' }}>
-          <Building2 size={16} />
-          <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Empresas ({proveedores.length})
-          </span>
+      <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid #f1ede7' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280' }}>
+            <Building2 size={16} />
+            <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Empresas ({proveedores.length})
+            </span>
+          </div>
+
+          <button
+            onClick={onOpenNewProvider}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '5px 11px',
+              backgroundColor: '#16a34a',
+              color: '#ffffff',
+              borderRadius: '7px',
+              border: 'none',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 1px 3px rgba(22, 163, 74, 0.25)',
+              transition: 'background-color 0.15s ease'
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#15803d')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#16a34a')}
+            title='Registrar nuevo proveedor'
+          >
+            <span>Nuevo +</span>
+          </button>
         </div>
 
         {/* Buscador Rápido */}

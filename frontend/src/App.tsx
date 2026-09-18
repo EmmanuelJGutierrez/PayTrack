@@ -16,8 +16,8 @@ import { exportPlanillaProveedoresToCsv } from './utils/exporter';
 
 export const App: React.FC = () => {
   // Inicializamos en Julio 2026 (exacto como el diseño de Figma)
-  const [anio, setAnio] = useState(2026);
-  const [mes, setMes] = useState(7);
+  const [anio, setAnio] = useState(new Date().getFullYear());
+  const [mes, setMes] = useState(new Date().getMonth() + 1);
 
   const [proveedores, setProveedores] = useState<ProveedorResumen[]>([]);
   const [selectedProviderId, setSelectedProviderId] = useState<number | null>(null);
@@ -153,7 +153,6 @@ export const App: React.FC = () => {
         onPrevMonth={handlePrevMonth}
         onNextMonth={handleNextMonth}
         onOpenCalendar={() => setIsCalendarOpen(true)}
-        onOpenNewProvider={() => setIsAddProviderOpen(true)}
         onOpenMonthlySummary={() => setIsMonthlySummaryOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenBackup={() => setIsBackupOpen(true)}
@@ -168,6 +167,7 @@ export const App: React.FC = () => {
           onSelect={setSelectedProviderId}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          onOpenNewProvider={() => setIsAddProviderOpen(true)}
         />
 
         <main style={{ flex: 1, backgroundColor: '#f7f6f2', minHeight: 'calc(100vh - 70px)' }}>
@@ -190,7 +190,7 @@ export const App: React.FC = () => {
                 No hay ningún proveedor seleccionado
               </h2>
               <p style={{ fontSize: '15px' }}>
-                Hacé clic en "+ Nuevo Proveedor" arriba a la derecha para dar de alta tu primera empresa.
+                Hacé clic en "+ Nuevo Proveedor" en la barra lateral izquierda para dar de alta tu primera empresa.
               </p>
             </div>
           )}

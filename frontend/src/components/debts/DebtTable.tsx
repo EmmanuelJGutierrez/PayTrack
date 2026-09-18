@@ -184,7 +184,7 @@ export const DebtTable: React.FC<Props> = ({
               title="Ver todos los movimientos (deudas y pagos) de este proveedor"
             >
               <History size={17} />
-              <span>Historial de Movimientos</span>
+              <span>Historial</span>
             </button>
 
             <button
@@ -192,7 +192,8 @@ export const DebtTable: React.FC<Props> = ({
               style={{
                 padding: '10px 18px',
                 borderRadius: '10px',
-                backgroundColor: '#111827',
+                backgroundColor: '#2563eb',
+                boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
                 color: '#ffffff',
                 fontWeight: 700,
                 fontSize: '14px',
@@ -201,11 +202,11 @@ export const DebtTable: React.FC<Props> = ({
                 gap: '8px',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                transition: 'background-color 0.15s ease'
               }}
             >
               <Plus size={17} />
-              <span>+ Cargar Deuda</span>
+              <span>+ Deuda</span>
             </button>
           </div>
         </div>

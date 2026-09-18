@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Plus, BarChart3, HelpCircle, FileSpreadsheet, ShieldCheck } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, HelpCircle, FileSpreadsheet } from 'lucide-react';
 
 interface Props {
   anio: number;
@@ -7,7 +7,6 @@ interface Props {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onOpenCalendar: () => void;
-  onOpenNewProvider: () => void;
   onOpenMonthlySummary: () => void;
   onOpenHelp: () => void;
   onOpenBackup?: () => void;
@@ -25,7 +24,6 @@ export const Header: React.FC<Props> = ({
   onPrevMonth,
   onNextMonth,
   onOpenCalendar,
-  onOpenNewProvider,
   onOpenMonthlySummary,
   onOpenHelp,
   onOpenBackup,
@@ -114,31 +112,28 @@ export const Header: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Acciones principales a la derecha */}
+      {/* Acciones principales a la derecha (limpio y despejado) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {onExportPlanilla && (
           <button
             onClick={onExportPlanilla}
             style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              backgroundColor: '#f0fdf4',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '9px 14px',
-              backgroundColor: '#f8fafc',
-              color: '#334155',
-              borderRadius: '10px',
-              border: '1.5px solid #cbd5e1',
-              fontWeight: 600,
-              fontSize: '13px',
+              justifyContent: 'center',
+              border: '1.5px solid #bbf7d0',
               cursor: 'pointer',
-              transition: 'background-color 0.15s ease'
+              transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8fafc')}
-            title="Exporta el estado general de deudas de todos los proveedores a una planilla Excel (.csv)"
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+            title='Exportar Planilla a Excel (.csv)'
           >
-            <FileSpreadsheet size={16} color="#15803d" />
-            <span>Exportar Planilla</span>
+            <FileSpreadsheet size={19} color='#15803d' />
           </button>
         )}
 
@@ -146,25 +141,33 @@ export const Header: React.FC<Props> = ({
           <button
             onClick={onOpenBackup}
             style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              backgroundColor: '#f0f9ff',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '9px 14px',
-              backgroundColor: '#f8fafc',
-              color: '#334155',
-              borderRadius: '10px',
-              border: '1.5px solid #cbd5e1',
-              fontWeight: 600,
-              fontSize: '13px',
+              justifyContent: 'center',
+              border: '1.5px solid #bae6fd',
               cursor: 'pointer',
-              transition: 'background-color 0.15s ease'
+              transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8fafc')}
-            title="Guardar o restaurar copias de seguridad de la base de datos (HU-20)"
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e0f2fe')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0f9ff')}
+            title='Respaldo y Restauración de Base de Datos'
           >
-            <ShieldCheck size={16} color="#2563eb" />
-            <span>Respaldo</span>
+            <svg width='22' height='22' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+              <ellipse cx='20' cy='11' rx='13' ry='5' fill='#bae6fd' stroke='#0284c7' strokeWidth='2' />
+              <path d='M7 11V18C7 20.8 12.8 23 20 23C27.2 23 33 20.8 33 18V11' fill='#e0f2fe' stroke='#0284c7' strokeWidth='2' />
+              <path d='M7 18V25C7 27.8 12.8 30 20 30C23.6 30 26.8 29.5 29.2 28.5' stroke='#0284c7' strokeWidth='2' />
+              <path d='M7 25V32C7 34.8 12.8 37 20 37C22.6 37 25.1 36.6 27.2 35.8' stroke='#0284c7' strokeWidth='2' />
+              <circle cx='10' cy='14' r='0.9' fill='#0284c7' />
+              <circle cx='10' cy='21.5' r='0.9' fill='#0284c7' />
+              <circle cx='10' cy='28.5' r='0.9' fill='#0284c7' />
+              <circle cx='34' cy='33' r='11' fill='#ffffff' stroke='#bae6fd' strokeWidth='1.5' />
+              <path d='M34 26C37.8 26 41 29.2 41 33C41 36.8 37.8 40 34 40C30.8 40 28.1 37.8 27.3 34.8' stroke='#0284c7' strokeWidth='2.4' strokeLinecap='round' />
+              <polyline points='30,26 34,26 34,30' stroke='#0284c7' strokeWidth='2.4' strokeLinecap='round' strokeLinejoin='round' fill='none' />
+            </svg>
           </button>
         )}
 
@@ -173,41 +176,23 @@ export const Header: React.FC<Props> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '9px 16px',
+            gap: '6px',
+            padding: '8px 14px',
             backgroundColor: '#f0fdf4',
             color: '#15803d',
             borderRadius: '10px',
             border: '1.5px solid #bbf7d0',
             fontWeight: 700,
             fontSize: '13px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
           }}
-          title="Ver resumen y desglose de pagos del mes"
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+          title='Ver resumen y desglose de pagos del mes'
         >
           <BarChart3 size={17} />
-          <span>Resumen del Mes</span>
-        </button>
-
-        <button
-          onClick={onOpenNewProvider}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 18px',
-            backgroundColor: '#2563eb',
-            color: '#ffffff',
-            borderRadius: '10px',
-            border: 'none',
-            fontWeight: 700,
-            fontSize: '13px',
-            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
-            cursor: 'pointer'
-          }}
-        >
-          <Plus size={17} />
-          <span>+ Nuevo Proveedor</span>
+          <span>Resumen</span>
         </button>
 
         <button
@@ -224,7 +209,7 @@ export const Header: React.FC<Props> = ({
             border: 'none',
             cursor: 'pointer'
           }}
-          title="Ayuda / Instrucciones"
+          title='Ayuda / Instrucciones'
         >
           <HelpCircle size={18} />
         </button>
