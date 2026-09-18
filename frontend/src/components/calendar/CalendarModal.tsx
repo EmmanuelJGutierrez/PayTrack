@@ -37,11 +37,13 @@ export const CalendarModal: React.FC<Props> = ({
   const [resumenMes, setResumenMes] = useState<{
     totalMesPagos: number;
     totalMesDeudas: number;
+    saldoNetoMes: number;
     totalArrastrePrevio: number;
     cantidadDeudasArrastre: number;
   }>({
     totalMesPagos: 0,
     totalMesDeudas: 0,
+    saldoNetoMes: 0,
     totalArrastrePrevio: 0,
     cantidadDeudasArrastre: 0
   });
@@ -53,8 +55,9 @@ export const CalendarModal: React.FC<Props> = ({
         .then(res => {
           setDias(res.dias);
           setResumenMes({
-            totalMesPagos: res.totalMesPagos ?? res.dias.reduce((acc, d) => acc + d.montoPagado, 0),
-            totalMesDeudas: res.totalMesDeudas ?? res.dias.reduce((acc, d) => acc + (d.montoVencimientos ?? d.montoDeudas), 0),
+            totalMesPagos: res.totalMesPagos ?? 0,
+            totalMesDeudas: res.totalMesDeudas ?? 0,
+            saldoNetoMes: res.saldoNetoMes ?? ((res.totalMesPagos ?? 0) - (res.totalMesDeudas ?? 0)),
             totalArrastrePrevio: res.totalArrastrePrevio ?? 0,
             cantidadDeudasArrastre: res.cantidadDeudasArrastre ?? 0
           });
@@ -87,49 +90,37 @@ export const CalendarModal: React.FC<Props> = ({
   const primerDiaSemana = new Date(anio, mes - 1, 1).getDay();
   const offsetInicial = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1;
 
-  const totalDeudasConArrastre = resumenMes.totalMesDeudas + resumenMes.totalArrastrePrevio;
+  const saldoNeto = resumenMes.saldoNetoMes;
+  const isSaldado = saldoNeto === 0;
+  const isNegativo = saldoNeto < 0;
 
   const headerBadges = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-      {/* Total Pagos del Mes */}
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '4px',
-          padding: '4px 10px',
-          backgroundColor: '#ecfdf5',
-          border: '1px solid #a7f3d0',
-          borderRadius: '7px',
-          color: '#15803d',
-          fontSize: '12px',
-          fontWeight: 700
-        }}
-        title={`Total de pagos realizados durante ${nombreMes} ${anio}`}
-      >
-        <ArrowDownRight size={14} />
-        <span>Pagos: ${resumenMes.totalMesPagos.toLocaleString()}</span>
-      </div>
-
-      {/* Total Deudas (con cálculo unificado e indicador de arrastre previo) */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Recuadro único de Total del mes */}
       <div
         style={{
           position: 'relative',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '5px',
-          padding: '4px 10px',
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '7px',
-          color: '#dc2626',
-          fontSize: '12px',
-          fontWeight: 700
+          gap: '6px',
+          padding: '5px 12px',
+          backgroundColor: isSaldado ? '#ecfdf5' : isNegativo ? '#fef2f2' : '#ecfdf5',
+          border: isSaldado ? '1px solid #a7f3d0' : isNegativo ? '1px solid #fecaca' : '1px solid #a7f3d0',
+          borderRadius: '8px',
+          color: isSaldado ? '#15803d' : isNegativo ? '#dc2626' : '#15803d',
+          fontSize: '13px',
+          fontWeight: 800
         }}
       >
-        <ArrowUpRight size={14} />
-        <span>Deudas: ${totalDeudasConArrastre.toLocaleString()}</span>
+        <span>
+          {isSaldado
+            ? 'Total: $0'
+            : isNegativo
+            ? `Total: -$${Math.abs(saldoNeto).toLocaleString()}`
+            : `Total: +$${saldoNeto.toLocaleString()}`}
+        </span>
 
+        {/* Alerta de arrastre previo con icono (!) sin emojis */}
         {resumenMes.totalArrastrePrevio > 0 && (
           <div
             style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
@@ -144,7 +135,7 @@ export const CalendarModal: React.FC<Props> = ({
                 width: '16px',
                 height: '16px',
                 borderRadius: '50%',
-                backgroundColor: '#dc2626',
+                backgroundColor: isSaldado ? '#15803d' : '#dc2626',
                 color: '#ffffff',
                 fontSize: '11px',
                 fontWeight: 800,
@@ -152,7 +143,7 @@ export const CalendarModal: React.FC<Props> = ({
                 marginLeft: '3px',
                 userSelect: 'none'
               }}
-              title={`Si cree que hay inconsistencias en sus pagos de este mes es porque hay un arrastre de deuda del periodo anterior por un monto de $${resumenMes.totalArrastrePrevio.toLocaleString()}.`}
+              title={`Si cree que hay inconsistencias en sus pagos de este mes es porque hay un arrastre de deuda del anterior monto: $${resumenMes.totalArrastrePrevio.toLocaleString()}.`}
             >
               !
             </div>
@@ -163,11 +154,11 @@ export const CalendarModal: React.FC<Props> = ({
                   position: 'absolute',
                   top: 'calc(100% + 8px)',
                   right: '0px',
-                  width: '290px',
+                  width: '300px',
                   backgroundColor: '#1e293b',
                   color: '#ffffff',
-                  padding: '9px 12px',
-                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  borderRadius: '9px',
                   fontSize: '12px',
                   fontWeight: 500,
                   lineHeight: '1.45',
@@ -176,7 +167,7 @@ export const CalendarModal: React.FC<Props> = ({
                   pointerEvents: 'none'
                 }}
               >
-                Si cree que hay inconsistencias en sus pagos o comprobantes de este mes es porque hay un arrastre de deuda del anterior monto:{' '}
+                Si cree que hay inconsistencias en sus pagos de este mes es porque hay un arrastre de deuda del anterior monto:{' '}
                 <span style={{ color: '#fca5a5', fontWeight: 700 }}>
                   ${resumenMes.totalArrastrePrevio.toLocaleString()}
                 </span>.
@@ -410,7 +401,7 @@ export const CalendarModal: React.FC<Props> = ({
                             }}
                             title={`Vence: $${Math.round(d.montoVencimientos ?? d.montoDeudas).toLocaleString()}`}
                           >
-                            ⏰${Math.round(d.montoVencimientos ?? d.montoDeudas).toLocaleString()}
+                            <Clock size={10} style={{ display: 'inline-block', verticalAlign: '-1px', marginRight: '2px' }} />${Math.round(d.montoVencimientos ?? d.montoDeudas).toLocaleString()}
                           </span>
                         ) : tieneDeudasEmitidas ? (
                           <span

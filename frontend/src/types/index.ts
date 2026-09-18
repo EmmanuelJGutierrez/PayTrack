@@ -90,6 +90,7 @@ export interface CalendarioMensualResponse {
   mes: number;
   totalMesPagos?: number;
   totalMesDeudas?: number;
+  saldoNetoMes?: number;
   totalArrastrePrevio?: number;
   cantidadDeudasArrastre?: number;
   dias: DiaCalendario[];

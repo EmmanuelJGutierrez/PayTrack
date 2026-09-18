@@ -122,8 +122,9 @@ export async function fetchCalendarioMensual(anio: number, mes: number, tzOffset
   return res.json();
 }
 
-export async function fetchDetalleDia(anio: number, mes: number, dia: number): Promise<DetalleDiaResponse> {
-  const res = await fetch(`${API_BASE}/calendario/${anio}/${mes}/${dia}`);
+export async function fetchDetalleDia(anio: number, mes: number, dia: number, tzOffset?: number): Promise<DetalleDiaResponse> {
+  const offset = tzOffset !== undefined ? tzOffset : -new Date().getTimezoneOffset();
+  const res = await fetch(`${API_BASE}/calendario/${anio}/${mes}/${dia}?tzOffset=${offset}`);
   if (!res.ok) throw new Error(`Error al cargar detalle del día ${dia}`);
   return res.json();
 }
