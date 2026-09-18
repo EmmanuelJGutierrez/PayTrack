@@ -35,7 +35,9 @@ public class CrearPago : IEndpoint
             return Results.NotFound(new { error = true, code = "PROVEEDOR_NO_ENCONTRADO", message = "Proveedor no encontrado." });
         }
 
-        if (req.Monto <= 0)
+        var monto = Math.Round(req.Monto, 2);
+
+        if (monto <= 0)
         {
             return Results.BadRequest(new { error = true, code = "MONTO_INVALIDO", message = "El monto a pagar debe ser mayor a cero." });
         }
@@ -44,10 +46,6 @@ public class CrearPago : IEndpoint
         {
             return Results.BadRequest(new { error = true, code = "MEDIO_PAGO_INVALIDO", message = "Medio de pago no válido." });
         }
-
-        var totalDeudasActivas = proveedor.Deudas.Where(d => d.Activo).Sum(d => d.Monto);
-        var totalPagosActivos = proveedor.Pagos.Where(p => p.Activo).Sum(p => p.Monto);
-        var saldoProveedor = Math.Max(0, totalDeudasActivas - totalPagosActivos);
 
         // Validación si se imputa a una deuda puntual
         Deuda? deudaPuntual = null;
@@ -60,27 +58,37 @@ public class CrearPago : IEndpoint
             }
 
             var pagosDeuda = await db.Pagos.Where(p => p.DeudaId == deudaPuntual.Id && p.Activo).SumAsync(p => p.Monto);
-            var saldoDeuda = Math.Max(0, deudaPuntual.Monto - pagosDeuda);
+            var saldoDeuda = Math.Round(Math.Max(0, deudaPuntual.Monto - pagosDeuda), 2);
 
-            if (req.Monto > saldoDeuda)
+            if (monto > saldoDeuda + 0.005m)
             {
                 return Results.BadRequest(new
                 {
                     error = true,
                     code = "PAGO_EXCEDE_SALDO",
-                    message = $"El pago (${req.Monto:N2}) supera el saldo pendiente de esta deuda (${saldoDeuda:N2}). No se permiten pagos excedentes."
+                    message = $"El pago (${monto:N2}) supera el saldo pendiente de esta deuda (${saldoDeuda:N2}). No se permiten pagos excedentes."
                 });
             }
         }
 
-        // Validación general contra el saldo total del proveedor
-        if (req.Monto > saldoProveedor)
+        // Validación general contra el saldo total pendiente de las deudas activas del proveedor
+        decimal saldoProveedor = 0;
+        foreach (var d in proveedor.Deudas.Where(d => d.Activo))
+        {
+            var pagosDeuda = proveedor.Pagos.Where(p => p.DeudaId == d.Id && p.Activo).Sum(p => p.Monto);
+            saldoProveedor += Math.Max(0, d.Monto - pagosDeuda);
+        }
+
+        var pagosGenerales = proveedor.Pagos.Where(p => p.DeudaId == null && p.Activo).Sum(p => p.Monto);
+        saldoProveedor = Math.Round(Math.Max(0, saldoProveedor - pagosGenerales), 2);
+
+        if (monto > saldoProveedor + 0.005m)
         {
             return Results.BadRequest(new
             {
                 error = true,
                 code = "PAGO_EXCEDE_SALDO",
-                message = $"El pago (${req.Monto:N2}) supera el saldo pendiente total del proveedor (${saldoProveedor:N2}). No se permiten pagos excedentes."
+                message = $"El pago (${monto:N2}) supera el saldo pendiente total del proveedor (${saldoProveedor:N2}). No se permiten pagos excedentes."
             });
         }
 
@@ -88,7 +96,7 @@ public class CrearPago : IEndpoint
         {
             ProveedorId = id,
             DeudaId = req.DeudaId,
-            Monto = Math.Round(req.Monto, 2),
+            Monto = monto,
             MedioPago = medio,
             Referencia = req.Referencia?.Trim(),
             Comentario = req.Comentario?.Trim(),

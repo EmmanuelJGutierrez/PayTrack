@@ -21,6 +21,24 @@ public static class DbInitializer
             // Columna ya existe, ignorar
         }
 
+        // Asegurar consistencia de integridad referencial:
+        // Si hay pagos activos asociados a comprobantes de deuda que fueron dados de baja (inactivos),
+        // se deben inactivar dichos pagos para que no distorsionen los saldos pendientes de otras deudas.
+        var pagosInconsistentes = db.Pagos
+            .Include(p => p.Deuda)
+            .Where(p => p.Activo && p.Deuda != null && !p.Deuda.Activo)
+            .ToList();
+
+        if (pagosInconsistentes.Count > 0)
+        {
+            foreach (var p in pagosInconsistentes)
+            {
+                p.Activo = false;
+                p.FechaBaja = DateTime.UtcNow;
+            }
+            db.SaveChanges();
+        }
+
         if (db.Proveedores.Any())
         {
             return;

@@ -44,15 +44,16 @@ export const AddPaymentModal: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
 
   const handlePagarTotal = () => {
-    setMonto(saldoMaximo.toString());
+    const num = Math.round(saldoMaximo * 100) / 100;
+    setMonto(num.toString());
     setError(null);
   };
 
   const handleMontoChange = (val: string) => {
     setMonto(val);
-    const num = parseFloat(val);
-    if (!isNaN(num) && num > saldoMaximo) {
-      setError(`El monto no puede superar el saldo pendiente ($${saldoMaximo.toLocaleString()})`);
+    const num = Math.round(parseFloat(val) * 100) / 100;
+    if (!isNaN(num) && num > saldoMaximo + 0.005) {
+      setError(`El monto no puede superar el saldo pendiente (${saldoMaximo.toLocaleString()})`);
     } else {
       setError(null);
     }
@@ -60,14 +61,14 @@ export const AddPaymentModal: React.FC<Props> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const numMonto = parseFloat(monto);
+    const numMonto = Math.round(parseFloat(monto) * 100) / 100;
     if (isNaN(numMonto) || numMonto <= 0) {
       setError('El monto a pagar debe ser mayor a 0');
       return;
     }
 
-    if (numMonto > saldoMaximo) {
-      setError(`No podés pagar más del saldo adeudado ($${saldoMaximo.toLocaleString()})`);
+    if (numMonto > saldoMaximo + 0.005) {
+      setError(`No podés pagar más del saldo adeudado (${saldoMaximo.toLocaleString()})`);
       return;
     }
 
@@ -303,7 +304,7 @@ export const AddPaymentModal: React.FC<Props> = ({
           </button>
           <button
             type="submit"
-            disabled={loading || !monto || parseFloat(monto) <= 0 || parseFloat(monto) > saldoMaximo}
+            disabled={loading || !monto || parseFloat(monto) <= 0 || parseFloat(monto) > saldoMaximo + 0.005}
             style={{
               padding: '11px 26px',
               borderRadius: '8px',

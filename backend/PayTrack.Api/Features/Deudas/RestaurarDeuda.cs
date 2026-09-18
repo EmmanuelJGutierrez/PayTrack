@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -37,6 +38,14 @@ public class RestaurarDeuda : IEndpoint
 
         deuda.Activo = true;
         deuda.FechaBaja = null;
+
+        // Restaurar también los pagos asociados a esta deuda
+        var pagosDeuda = await db.Pagos.Where(p => p.DeudaId == deudaId && !p.Activo).ToListAsync();
+        foreach (var p in pagosDeuda)
+        {
+            p.Activo = true;
+            p.FechaBaja = null;
+        }
 
         await db.SaveChangesAsync();
 

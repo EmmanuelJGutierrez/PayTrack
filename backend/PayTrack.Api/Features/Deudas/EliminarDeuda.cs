@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,14 @@ public class EliminarDeuda : IEndpoint
 
         deuda.Activo = false;
         deuda.FechaBaja = DateTime.UtcNow;
+
+        // Inactivar también los pagos asociados a esta deuda para que no afecten el saldo de otras deudas
+        var pagosDeuda = await db.Pagos.Where(p => p.DeudaId == deudaId && p.Activo).ToListAsync();
+        foreach (var p in pagosDeuda)
+        {
+            p.Activo = false;
+            p.FechaBaja = DateTime.UtcNow;
+        }
 
         await db.SaveChangesAsync();
         return Results.Ok(new { message = "Deuda eliminada correctamente." });
