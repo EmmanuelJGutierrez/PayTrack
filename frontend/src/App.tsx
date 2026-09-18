@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, Building2, Plus } from 'lucide-react';
+import { AlertTriangle, Building2, Plus, Calendar, FileText, FileSpreadsheet } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
@@ -196,7 +196,7 @@ export const App: React.FC = () => {
             >
               <div
                 style={{
-                  maxWidth: '520px',
+                  maxWidth: '540px',
                   width: '100%',
                   backgroundColor: '#ffffff',
                   borderRadius: '16px',
@@ -216,7 +216,7 @@ export const App: React.FC = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: '20px',
+                    marginBottom: '18px',
                     color: '#15803d',
                     boxShadow: '0 4px 12px rgba(21, 128, 61, 0.12)'
                   }}
@@ -226,25 +226,36 @@ export const App: React.FC = () => {
                 
                 <h2
                   style={{
-                    fontSize: '22px',
+                    fontSize: '24px',
                     fontWeight: 800,
                     color: '#1e293b',
-                    marginBottom: '10px',
+                    marginBottom: '8px',
                     letterSpacing: '-0.02em'
                   }}
                 >
-                  ¡Te damos la bienvenida a PayTrack!
+                  PayTrack
                 </h2>
+                
+                <h3
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: '#15803d',
+                    marginBottom: '14px'
+                  }}
+                >
+                  Su aplicación confiable para gestionar y controlar sus deudas
+                </h3>
                 
                 <p
                   style={{
                     fontSize: '14px',
                     color: '#64748b',
                     lineHeight: '1.6',
-                    marginBottom: '24px'
+                    marginBottom: '26px'
                   }}
                 >
-                  La aplicación está lista para su uso sin datos precargados. Para comenzar a gestionar comprobantes (facturas y remitos), vencimientos y pagos, registrá tu primer proveedor.
+                  Puede registrar y dar seguimiento a sus comprobantes (facturas y remitos), controlar fechas de vencimiento, registrar pagos parciales o totales y exportar planillas resumen. Para iniciar agregue un nuevo proveedor.
                 </p>
 
                 <button
@@ -268,7 +279,7 @@ export const App: React.FC = () => {
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#15803d')}
                 >
                   <Plus size={18} />
-                  <span>Registrar Primer Proveedor</span>
+                  <span>Agregar nuevo proveedor</span>
                 </button>
 
                 <div
@@ -278,18 +289,18 @@ export const App: React.FC = () => {
                     borderTop: '1px solid #f1f5f9',
                     display: 'flex',
                     justifyContent: 'space-around',
-                    fontSize: '12px',
+                    fontSize: '12.5px',
                     color: '#64748b'
                   }}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    📅 Control mensual
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Calendar size={15} color="#15803d" /> Control mensual
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    📑 Facturas y Remitos
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FileText size={15} color="#15803d" /> Facturas y Remitos
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    📊 Planillas Excel
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FileSpreadsheet size={15} color="#15803d" /> Planillas Excel
                   </span>
                 </div>
               </div>
