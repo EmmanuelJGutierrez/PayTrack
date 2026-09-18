@@ -3,7 +3,7 @@ import { ModalWrapper } from '../modals/ModalWrapper';
 import { fetchCalendarioMensual, fetchDetalleDia } from '../../services/api';
 import type { DiaCalendario, DetalleDiaResponse } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, ArrowDownRight, ArrowUpRight, AlertTriangle } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -33,6 +33,17 @@ export const CalendarModal: React.FC<Props> = ({
   const [detalleDia, setDetalleDia] = useState<DetalleDiaResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
+  const [resumenMes, setResumenMes] = useState<{
+    totalMesPagos: number;
+    totalMesDeudas: number;
+    totalArrastrePrevio: number;
+    cantidadDeudasArrastre: number;
+  }>({
+    totalMesPagos: 0,
+    totalMesDeudas: 0,
+    totalArrastrePrevio: 0,
+    cantidadDeudasArrastre: 0
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -40,6 +51,12 @@ export const CalendarModal: React.FC<Props> = ({
       fetchCalendarioMensual(anio, mes)
         .then(res => {
           setDias(res.dias);
+          setResumenMes({
+            totalMesPagos: res.totalMesPagos ?? res.dias.reduce((acc, d) => acc + d.montoPagado, 0),
+            totalMesDeudas: res.totalMesDeudas ?? res.dias.reduce((acc, d) => acc + (d.montoVencimientos ?? d.montoDeudas), 0),
+            totalArrastrePrevio: res.totalArrastrePrevio ?? 0,
+            cantidadDeudasArrastre: res.cantidadDeudasArrastre ?? 0
+          });
           const primerDiaConActividad = res.dias.find(
             d => d.cantidadDeudas > 0 || d.cantidadPagos > 0 || (d.cantidadVencimientos ?? 0) > 0
           );
@@ -69,11 +86,78 @@ export const CalendarModal: React.FC<Props> = ({
   const primerDiaSemana = new Date(anio, mes - 1, 1).getDay();
   const offsetInicial = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1;
 
+  const headerBadges = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+      {/* Total Pagos del Mes */}
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 10px',
+          backgroundColor: '#ecfdf5',
+          border: '1px solid #a7f3d0',
+          borderRadius: '7px',
+          color: '#15803d',
+          fontSize: '12px',
+          fontWeight: 700
+        }}
+        title={`Total abonado en pagos durante ${nombreMes} ${anio}`}
+      >
+        <ArrowDownRight size={14} />
+        <span>Pagos: ${resumenMes.totalMesPagos.toLocaleString()}</span>
+      </div>
+
+      {/* Total Deudas / Vencimientos del Mes */}
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 10px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '7px',
+          color: '#dc2626',
+          fontSize: '12px',
+          fontWeight: 700
+        }}
+        title={`Total de deudas y vencimientos correspondientes a ${nombreMes} ${anio}`}
+      >
+        <ArrowUpRight size={14} />
+        <span>Deudas: ${resumenMes.totalMesDeudas.toLocaleString()}</span>
+      </div>
+
+      {/* Pastilla de Arrastre Previo (si hay deudas impagas anteriores) */}
+      {resumenMes.totalArrastrePrevio > 0 && (
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 10px',
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fde68a',
+            borderRadius: '7px',
+            color: '#b45309',
+            fontSize: '12px',
+            fontWeight: 700
+          }}
+          title={`${resumenMes.cantidadDeudasArrastre} comprobante(s) emitidos en meses anteriores que llegaron a ${nombreMes} con saldo pendiente`}
+        >
+          <AlertTriangle size={13} />
+          <span>Arrastre previo: ${resumenMes.totalArrastrePrevio.toLocaleString()}</span>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <ModalWrapper
       isOpen={isOpen}
       onClose={onClose}
       title={`Calendario de Movimientos — ${nombreMes} ${anio}`}
+      headerRight={headerBadges}
       maxWidth="880px"
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

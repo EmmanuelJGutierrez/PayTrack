@@ -5,6 +5,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  headerRight?: React.ReactNode;
   children: React.ReactNode;
   maxWidth?: string;
 }
@@ -13,6 +14,7 @@ export const ModalWrapper: React.FC<Props> = ({
   isOpen,
   onClose,
   title,
+  headerRight,
   children,
   maxWidth = '540px'
 }) => {
@@ -73,35 +75,40 @@ export const ModalWrapper: React.FC<Props> = ({
         {/* Header */}
         <div
           style={{
-            padding: '14px 20px',
+            padding: '12px 20px',
             borderBottom: '1px solid #e5e7eb',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: '#fafaf9'
+            backgroundColor: '#fafaf9',
+            gap: '12px',
+            flexWrap: 'wrap'
           }}
         >
-          <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#111827', margin: 0 }}>{title}</h3>
-          <button
-            onClick={onClose}
-            style={{
-              padding: '6px',
-              borderRadius: '8px',
-              color: '#6b7280',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'background-color 0.15s ease'
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#e5e7eb')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-            aria-label="Cerrar modal"
-          >
-            <X size={19} />
-          </button>
+          <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#111827', margin: 0 }}>{title}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
+            {headerRight}
+            <button
+              onClick={onClose}
+              style={{
+                padding: '6px',
+                borderRadius: '8px',
+                color: '#6b7280',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.15s ease'
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#e5e7eb')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+              aria-label="Cerrar modal"
+            >
+              <X size={19} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

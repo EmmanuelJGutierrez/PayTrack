@@ -75,10 +75,42 @@ public class ObtenerCalendarioMensual : IEndpoint
             ));
         }
 
+        var inicioMes = new DateTime(y, m, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        // Deudas previas (emitidas antes del mes actual) que llegaron con saldo pendiente al inicio de este mes
+        var deudasPrevias = await db.Deudas
+            .Where(d => d.Activo && d.FechaDeuda < inicioMes)
+            .Include(d => d.Pagos)
+            .ToListAsync();
+
+        decimal totalArrastrePrevio = 0;
+        int cantidadDeudasArrastre = 0;
+
+        foreach (var d in deudasPrevias)
+        {
+            var pagosAntesDelMes = (d.Pagos ?? Enumerable.Empty<Domain.Pago>())
+                .Where(p => p.Activo && p.FechaPago < inicioMes)
+                .Sum(p => p.Monto);
+            var saldoAlInicio = d.Monto - pagosAntesDelMes;
+            if (saldoAlInicio > 0)
+            {
+                totalArrastrePrevio += saldoAlInicio;
+                cantidadDeudasArrastre++;
+            }
+        }
+
+        var totalMesPagos = pagos.Sum(p => p.Monto);
+        var todasDeudasMes = deudasEmitidas.Concat(deudasVencimiento).DistinctBy(d => d.Id).ToList();
+        var totalMesDeudas = todasDeudasMes.Sum(d => d.Monto);
+
         return Results.Ok(new
         {
             anio = y,
             mes = m,
+            totalMesPagos,
+            totalMesDeudas,
+            totalArrastrePrevio,
+            cantidadDeudasArrastre,
             dias = resumenPorDia
         });
     }

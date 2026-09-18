@@ -88,6 +88,10 @@ export interface DiaCalendario {
 export interface CalendarioMensualResponse {
   anio: number;
   mes: number;
+  totalMesPagos?: number;
+  totalMesDeudas?: number;
+  totalArrastrePrevio?: number;
+  cantidadDeudasArrastre?: number;
   dias: DiaCalendario[];
 }
 
