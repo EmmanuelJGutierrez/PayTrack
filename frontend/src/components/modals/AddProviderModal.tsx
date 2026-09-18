@@ -141,8 +141,8 @@ export const AddProviderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }
               fontSize: '15px',
               fontWeight: 700,
               color: '#ffffff',
-              backgroundColor: '#2563eb',
-              boxShadow: '0 2px 4px rgba(37, 99, 235, 0.2)'
+              backgroundColor: '#15803d',
+              boxShadow: '0 2px 4px rgba(21, 128, 61, 0.2)'
             }}
           >
             {loading ? 'Guardando...' : 'Guardar Proveedor'}

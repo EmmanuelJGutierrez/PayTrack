@@ -90,9 +90,9 @@ export const CalendarModal: React.FC<Props> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarIcon size={18} color="#2563eb" />
+            <CalendarIcon size={18} color="#0f5132" />
             <span style={{ fontSize: '16px', fontWeight: 800, color: '#1f2937' }}>
-              {nombreMes} <span style={{ color: '#2563eb' }}>{anio}</span>
+              {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
             </span>
           </div>
 

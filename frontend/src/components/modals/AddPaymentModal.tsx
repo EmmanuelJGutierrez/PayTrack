@@ -43,12 +43,6 @@ export const AddPaymentModal: React.FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePagarTotal = () => {
-    const num = Math.round(saldoMaximo * 100) / 100;
-    setMonto(num.toString());
-    setError(null);
-  };
-
   const handleMontoChange = (val: string) => {
     setMonto(val);
     const num = Math.round(parseFloat(val) * 100) / 100;
@@ -111,8 +105,8 @@ export const AddPaymentModal: React.FC<Props> = ({
         {/* Banner informativo de imputación y saldo */}
         <div
           style={{
-            backgroundColor: '#eff6ff',
-            border: '1.5px solid #bfdbfe',
+            backgroundColor: '#f0fdf4',
+            border: '1.5px solid #bbf7d0',
             padding: '14px 18px',
             borderRadius: '12px',
             display: 'flex',
@@ -122,34 +116,13 @@ export const AddPaymentModal: React.FC<Props> = ({
           }}
         >
           <div>
-            <p style={{ fontSize: '13px', color: '#1e40af', fontWeight: 600, margin: 0 }}>
+            <p style={{ fontSize: '13px', color: '#166534', fontWeight: 600, margin: 0 }}>
               {deudaConcepto ? `Imputado a deuda: ${deudaConcepto}` : `Proveedor: ${proveedorNombre}`}
             </p>
-            <p style={{ fontSize: '18px', fontWeight: 800, color: '#1e3a8a', marginTop: '4px', margin: 0 }}>
+            <p style={{ fontSize: '18px', fontWeight: 800, color: '#14532d', marginTop: '4px', margin: 0 }}>
               Saldo Pendiente: ${saldoMaximo.toLocaleString()}
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={handlePagarTotal}
-            style={{
-              backgroundColor: '#2563eb',
-              color: '#ffffff',
-              border: 'none',
-              padding: '9px 16px',
-              borderRadius: '8px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
-              transition: 'background-color 0.15s ease'
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#1d4ed8')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#2563eb')}
-          >
-            Pagar Total
-          </button>
         </div>
 
         {error && (
@@ -187,8 +160,8 @@ export const AddPaymentModal: React.FC<Props> = ({
                   style={{
                     padding: '12px 8px',
                     borderRadius: '10px',
-                    border: isSelected ? '2px solid #2563eb' : '1.5px solid #e5e7eb',
-                    backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
+                    border: isSelected ? '2px solid #059669' : '1.5px solid #e2e8f0',
+                    backgroundColor: isSelected ? '#ecfdf5' : '#ffffff',
                     color: isSelected ? '#1e40af' : '#374151',
                     fontWeight: isSelected ? 700 : 500,
                     fontSize: '13px',
@@ -228,11 +201,13 @@ export const AddPaymentModal: React.FC<Props> = ({
             placeholder={`0.00 (Máximo: $${saldoMaximo.toLocaleString()})`}
             value={monto}
             onChange={e => handleMontoChange(e.target.value)}
+            onWheel={e => e.currentTarget.blur()}
             style={{
               width: '100%',
               padding: '14px 16px',
               borderRadius: '10px',
-              border: '2px solid #cbd5e1',
+              border: '2px solid #e2e8f0',
+              backgroundColor: '#fcfdfd',
               fontSize: '20px',
               fontWeight: 800,
               color: '#0f172a',

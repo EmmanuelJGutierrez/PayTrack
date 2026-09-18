@@ -362,9 +362,10 @@ export const DebtTable: React.FC<Props> = ({
                     gap: '12px'
                   }}
                 >
-                  {/* Columna 1: Concepto con flecha, badges y barra de progreso */}
+                                    {/* Columna 1: Concepto alineado con Factura en fila 1, Progreso y Estado en fila 2 */}
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {/* Fila 1: Concepto y Comprobante siempre juntos y alineados */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <button
                         onClick={() => toggleRow(d.id)}
                         style={{ color: '#9ca3af', display: 'flex', alignItems: 'center', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
@@ -372,21 +373,20 @@ export const DebtTable: React.FC<Props> = ({
                         {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </button>
 
-                      <span style={{ fontSize: '15px', fontWeight: 700, color: '#111827' }}>
+                      <span style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
                         {d.concepto}
                       </span>
 
                       <ComprobanteBadge tipo={d.tipoComprobante} numero={d.numeroComprobante} />
-                      {renderVencimientoBadge(d)}
                     </div>
 
-                    {/* Barra de progreso (% saldado) */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', paddingLeft: '24px' }}>
+                    {/* Fila 2: Barra de progreso, Porcentaje y Estado (Saldado / Vencido) siempre juntos */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', paddingLeft: '26px' }}>
                       <div
                         style={{
-                          width: '120px',
+                          width: '110px',
                           height: '6px',
-                          backgroundColor: '#e5e7eb',
+                          backgroundColor: '#e2e8f0',
                           borderRadius: '4px',
                           overflow: 'hidden'
                         }}
@@ -403,9 +403,17 @@ export const DebtTable: React.FC<Props> = ({
                           }}
                         />
                       </div>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280' }}>
+
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        color: d.porcentajeSaldado >= 100 ? '#15803d' : d.porcentajeSaldado >= 50 ? '#059669' : '#0284c7'
+                      }}>
                         {d.porcentajeSaldado}%
                       </span>
+
+                      {/* Estado al lado del porcentaje en fila 2 */}
+                      {renderVencimientoBadge(d)}
                     </div>
                   </div>
 

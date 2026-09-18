@@ -316,7 +316,7 @@ export const AddDebtModal: React.FC<Props> = ({
               fontSize: '14px',
               fontWeight: 700,
               color: '#ffffff',
-              backgroundColor: '#111827',
+              backgroundColor: '#0f5132',
               border: 'none',
               cursor: 'pointer'
             }}
