@@ -43,6 +43,10 @@ export const AddPaymentModal: React.FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const numMontoInput = parseFloat(monto);
+  const isExcedido = !isNaN(numMontoInput) && numMontoInput > saldoMaximo + 0.005;
+  const isSubmitDisabled = loading || !monto || isNaN(numMontoInput) || numMontoInput <= 0 || isExcedido;
+
   const handleMontoChange = (val: string) => {
     setMonto(val);
     const num = Math.round(parseFloat(val) * 100) / 100;
@@ -206,13 +210,14 @@ export const AddPaymentModal: React.FC<Props> = ({
               width: '100%',
               padding: '14px 16px',
               borderRadius: '10px',
-              border: '2px solid #e2e8f0',
-              backgroundColor: '#fcfdfd',
+              border: isExcedido ? '2px solid #ef4444' : '2px solid #e2e8f0',
+              backgroundColor: isExcedido ? '#fef2f2' : '#fcfdfd',
               fontSize: '20px',
               fontWeight: 800,
-              color: '#0f172a',
+              color: isExcedido ? '#b91c1c' : '#0f172a',
               outline: 'none',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              transition: 'all 0.15s ease'
             }}
           />
         </div>
@@ -279,18 +284,19 @@ export const AddPaymentModal: React.FC<Props> = ({
           </button>
           <button
             type="submit"
-            disabled={loading || !monto || parseFloat(monto) <= 0 || parseFloat(monto) > saldoMaximo + 0.005}
+            disabled={isSubmitDisabled}
             style={{
               padding: '11px 26px',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: 700,
               color: '#ffffff',
-              backgroundColor: '#16a34a',
+              backgroundColor: isSubmitDisabled ? '#8ea396' : '#16a34a',
               border: 'none',
-              cursor: loading || !monto || parseFloat(monto) <= 0 ? 'not-allowed' : 'pointer',
-              boxShadow: '0 2px 4px rgba(22, 163, 74, 0.25)',
-              opacity: loading || !monto || parseFloat(monto) <= 0 ? 0.7 : 1
+              cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
+              boxShadow: isSubmitDisabled ? 'none' : '0 2px 4px rgba(22, 163, 74, 0.25)',
+              opacity: isSubmitDisabled ? 0.75 : 1,
+              transition: 'all 0.15s ease'
             }}
           >
             {loading ? 'Registrando...' : 'Confirmar Pago'}
