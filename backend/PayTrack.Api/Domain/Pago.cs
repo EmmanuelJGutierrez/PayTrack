@@ -26,6 +26,7 @@ public class Pago
     public string? Comentario { get; set; }
     public DateTime FechaPago { get; set; }
     public bool Activo { get; set; } = true;
+    public bool AnuladoManualmente { get; set; } = false;
     public DateTime? FechaBaja { get; set; }
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 }

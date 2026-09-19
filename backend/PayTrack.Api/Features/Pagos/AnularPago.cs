@@ -40,6 +40,7 @@ public class AnularPago : IEndpoint
         }
 
         pago.Activo = false;
+        pago.AnuladoManualmente = true;
         pago.FechaBaja = DateTime.UtcNow;
 
         await db.SaveChangesAsync();

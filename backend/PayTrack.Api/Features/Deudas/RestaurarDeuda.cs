@@ -40,7 +40,8 @@ public class RestaurarDeuda : IEndpoint
         deuda.FechaBaja = null;
 
         // Restaurar también los pagos asociados a esta deuda
-        var pagosDeuda = await db.Pagos.Where(p => p.DeudaId == deudaId && !p.Activo).ToListAsync();
+        // Restaurar únicamente los pagos que fueron dados de baja junto a la deuda (NO los que el usuario anuló manualmente)
+        var pagosDeuda = await db.Pagos.Where(p => p.DeudaId == deudaId && !p.Activo && !p.AnuladoManualmente).ToListAsync();
         foreach (var p in pagosDeuda)
         {
             p.Activo = true;

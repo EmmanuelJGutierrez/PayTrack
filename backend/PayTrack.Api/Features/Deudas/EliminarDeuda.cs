@@ -35,7 +35,7 @@ public class EliminarDeuda : IEndpoint
         foreach (var p in pagosDeuda)
         {
             p.Activo = false;
-            p.FechaBaja = DateTime.UtcNow;
+            p.FechaBaja = deuda.FechaBaja;
         }
 
         await db.SaveChangesAsync();

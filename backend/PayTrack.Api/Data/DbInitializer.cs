@@ -21,6 +21,27 @@ public static class DbInitializer
             // Columna ya existe, ignorar
         }
 
+        // Asegurar que la columna AnuladoManualmente exista en Pagos
+        try
+        {
+            db.Database.ExecuteSqlRaw("ALTER TABLE Pagos ADD COLUMN AnuladoManualmente INTEGER NOT NULL DEFAULT 0;");
+        }
+        catch
+        {
+            // Columna ya existe, ignorar
+        }
+
+        // Para pagos inactivos existentes, marcar AnuladoManualmente = 1 si no fue especificado
+        try
+        {
+            db.Database.ExecuteSqlRaw("UPDATE Pagos SET AnuladoManualmente = 1 WHERE Activo = 0;");
+            // Corregir caso donde Pago #2 ($1.000.000) habia sido reactivado erróneamente por RestaurarDeuda
+            db.Database.ExecuteSqlRaw("UPDATE Pagos SET Activo = 0, AnuladoManualmente = 1, FechaBaja = '2026-09-19 02:04:49' WHERE Id = 2 AND Monto = 1000000 AND ProveedorId = 1;");
+        }
+        catch
+        {
+        }
+
         // Asegurar consistencia de integridad referencial:
         // Si hay pagos activos asociados a comprobantes de deuda que fueron dados de baja (inactivos),
         // se deben inactivar dichos pagos para que no distorsionen los saldos pendientes de otras deudas.

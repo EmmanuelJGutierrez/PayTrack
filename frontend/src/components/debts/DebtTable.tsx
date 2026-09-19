@@ -431,11 +431,11 @@ export const DebtTable: React.FC<Props> = ({
                       >
                         <div
                           style={{
-                            width: `${Math.min(100, Math.max(0, d.porcentajeSaldado))}%`,
+                            width: `${Math.min(100, Math.max(0, isSaldado ? 100 : Math.min(99, d.porcentajeSaldado)))}%`,
                             height: '100%',
-                            background: d.porcentajeSaldado >= 100
+                            background: isSaldado
                               ? '#16a34a'
-                              : `linear-gradient(90deg, #38bdf8 0%, #10b981 ${Math.max(25, d.porcentajeSaldado)}%)`,
+                              : `linear-gradient(90deg, #38bdf8 0%, #10b981 ${Math.max(25, Math.min(99, d.porcentajeSaldado))}%)`,
                             borderRadius: '4px',
                             transition: 'width 0.3s ease'
                           }}
@@ -445,9 +445,9 @@ export const DebtTable: React.FC<Props> = ({
                       <span style={{
                         fontSize: '11px',
                         fontWeight: 800,
-                        color: d.porcentajeSaldado >= 100 ? '#15803d' : d.porcentajeSaldado >= 50 ? '#059669' : '#0284c7'
+                        color: isSaldado ? '#15803d' : d.porcentajeSaldado >= 50 ? '#059669' : '#0284c7'
                       }}>
-                        {d.porcentajeSaldado}%
+                        {isSaldado ? 100 : Math.min(99, d.porcentajeSaldado)}%
                       </span>
 
                       {/* Estado al lado del porcentaje en fila 2 */}

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PayTrack.Api.Domain;
 
 namespace PayTrack.Api.Data;
@@ -63,6 +63,7 @@ public class PayTrackDbContext : DbContext
             entity.Property(e => e.Referencia).HasMaxLength(100);
             entity.Property(e => e.Comentario).HasMaxLength(500);
             entity.Property(e => e.Activo).HasDefaultValue(true);
+            entity.Property(e => e.AnuladoManualmente).HasDefaultValue(false);
         });
     }
 }

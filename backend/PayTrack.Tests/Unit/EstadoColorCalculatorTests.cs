@@ -36,6 +36,17 @@ public class EstadoColorCalculatorTests
         Assert.Equal("Saldado", texto);
     }
 
+    [Fact]
+    public void Calcular_DeudaCasiPagadaAl99Porciento_DebeRetornar99YParcial_Nunca100NiSaldado()
+    {
+        // Caso reportado: Deuda de 2.000.000 con 1.990.000 pagados (restan 10.000) = 99.5%
+        var (porcentaje, color, texto) = EstadoColorCalculator.Calcular(2000000m, 1990000m);
+
+        Assert.Equal(99, porcentaje);
+        Assert.Equal("amarillo", color);
+        Assert.Equal("Parcial", texto);
+    }
+
     [Theory]
     [InlineData(1000, 500, 50)]
     [InlineData(1000, 750, 75)]
