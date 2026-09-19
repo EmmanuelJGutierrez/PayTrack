@@ -45,11 +45,15 @@ export const App: React.FC = () => {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  const loadProveedores = useCallback(async () => {
+  const loadProveedores = useCallback(async (retryCount = 0) => {
     try {
-      setConnectionError(null);
+      if (retryCount === 0) {
+        setLoading(true);
+        setConnectionError(null);
+      }
       const data = await fetchProveedores(anio, mes, searchTerm);
       setProveedores(data);
+      setConnectionError(null);
 
       if (data.length > 0) {
         setSelectedProviderId(prev => {
@@ -62,10 +66,18 @@ export const App: React.FC = () => {
         setSelectedProviderId(null);
       }
     } catch (err) {
+      if (retryCount < 5) {
+        setTimeout(() => {
+          loadProveedores(retryCount + 1);
+        }, 800);
+        return;
+      }
       console.error('Error al cargar proveedores:', err);
       setConnectionError('No se pudo conectar con el servidor backend. Verificá que la API de .NET esté corriendo en http://localhost:5177');
     } finally {
-      setLoading(false);
+      if (retryCount >= 5 || retryCount === 0) {
+        setLoading(false);
+      }
     }
   }, [anio, mes, searchTerm]);
 
@@ -136,13 +148,33 @@ export const App: React.FC = () => {
             backgroundColor: '#fee2e2',
             color: '#b91c1c',
             padding: '10px 24px',
-            textAlign: 'center',
             fontSize: '14px',
-            fontWeight: 700,
-            borderBottom: '1.5px solid #f87171'
+            fontWeight: 600,
+            borderBottom: '1.5px solid #f87171',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '14px'
           }}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16} /> {connectionError}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <AlertTriangle size={16} /> {connectionError}
+          </span>
+          <button
+            onClick={() => loadProveedores(0)}
+            style={{
+              background: '#dc2626',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 12px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
@@ -208,19 +240,20 @@ export const App: React.FC = () => {
               >
                 <div
                   style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '16px',
+                    width: '84px',
+                    height: '84px',
+                    borderRadius: '20px',
                     backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
+                    border: '1.5px solid #dcfce7',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: '18px',
-                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)'
+                    marginBottom: '20px',
+                    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+                    padding: '8px'
                   }}
                 >
-                  <img src="/PayTrack.png" alt="PayTrack" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
+                  <img src="/PayTrack.png" alt="PayTrack" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />
                 </div>
                 
                 <h2
