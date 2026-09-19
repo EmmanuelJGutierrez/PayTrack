@@ -17,7 +17,11 @@
         "all": false,
         "sidecar": true,
         "scope": [
-          { "name": "binaries/paytrack-api", "sidecar": true, "args": true }
+          {
+            "name": "binaries/paytrack-api",
+            "sidecar": true,
+            "args": true
+          }
         ]
       }
     },
@@ -25,7 +29,13 @@
       "active": true,
       "targets": "all",
       "identifier": "com.paytrack.desktop",
-      "icon": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.png",
+        "icons/icon.ico"
+      ],
       "externalBin": [
         "binaries/paytrack-api"
       ]

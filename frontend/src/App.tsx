@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, Building2, Plus, Calendar, FileText, FileSpreadsheet } from 'lucide-react';
+import { AlertTriangle, Plus, Calendar, FileText, FileSpreadsheet } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
@@ -211,17 +211,16 @@ export const App: React.FC = () => {
                     width: '64px',
                     height: '64px',
                     borderRadius: '16px',
-                    backgroundColor: '#ecfdf5',
-                    border: '1px solid #a7f3d0',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginBottom: '18px',
-                    color: '#15803d',
-                    boxShadow: '0 4px 12px rgba(21, 128, 61, 0.12)'
+                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)'
                   }}
                 >
-                  <Building2 size={32} />
+                  <img src="/PayTrack.png" alt="PayTrack" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
                 </div>
                 
                 <h2
