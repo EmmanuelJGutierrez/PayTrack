@@ -10,7 +10,7 @@
 } from '../types';
 
 // Usar proxy relativo /api (enrutado a http://localhost:5177 por Vite o Tauri)
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:5177/api';
 
 export async function fetchHealth(): Promise<{ status: string }> {
   const res = await fetch(`${API_BASE}/health`);
