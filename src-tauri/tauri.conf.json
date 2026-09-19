@@ -36,6 +36,10 @@
         "icons/icon.png",
         "icons/icon.ico"
       ],
+      "resources": [
+        "binaries/e_sqlite3.dll",
+        "binaries/appsettings.json"
+      ],
       "externalBin": [
         "binaries/paytrack-api"
       ],
