@@ -4,6 +4,7 @@ import { Header } from './components/layout/Header';
 import { ProviderSidebar } from './components/providers/ProviderSidebar';
 import { DebtTable } from './components/debts/DebtTable';
 import { AddProviderModal } from './components/modals/AddProviderModal';
+import { EditProviderModal } from './components/modals/EditProviderModal';
 import { AddDebtModal } from './components/modals/AddDebtModal';
 import { AddPaymentModal } from './components/modals/AddPaymentModal';
 import { HistoryModal } from './components/modals/HistoryModal';
@@ -30,6 +31,7 @@ export const App: React.FC = () => {
   // Modales
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isAddProviderOpen, setIsAddProviderOpen] = useState(false);
+  const [isEditProviderOpen, setIsEditProviderOpen] = useState(false);
   const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -215,6 +217,7 @@ export const App: React.FC = () => {
               onOpenAddPayment={handleOpenAddPayment}
               onOpenHistory={() => setIsHistoryOpen(true)}
               onDebtDeleted={handleDataChanged}
+              onOpenEditProvider={() => setIsEditProviderOpen(true)}
             />
           ) : proveedores.length === 0 ? (
             <div
@@ -367,6 +370,15 @@ export const App: React.FC = () => {
         onClose={() => setIsAddProviderOpen(false)}
         onSuccess={handleDataChanged}
       />
+
+      {selectedProvider && (
+        <EditProviderModal
+          isOpen={isEditProviderOpen}
+          onClose={() => setIsEditProviderOpen(false)}
+          onSuccess={handleDataChanged}
+          proveedor={selectedProvider}
+        />
+      )}
 
       {selectedProvider && (
         <>

@@ -39,6 +39,17 @@ export async function createProveedor(data: { nombre: string; contacto?: string;
   return body;
 }
 
+export async function updateProveedor(id: number, data: { nombre: string; contacto?: string; notas?: string }): Promise<ProveedorResumen> {
+  const res = await fetch(`${API_BASE}/proveedores/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || 'Error al actualizar proveedor');
+  return body;
+}
+
 export async function fetchDeudas(proveedorId: number, anio: number, mes: number): Promise<DeudaResumen[]> {
   const res = await fetch(`${API_BASE}/proveedores/${proveedorId}/deudas?anio=${anio}&mes=${mes}`);
   if (!res.ok) throw new Error('Error al cargar deudas');

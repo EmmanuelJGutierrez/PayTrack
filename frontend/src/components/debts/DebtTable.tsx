@@ -11,7 +11,8 @@ import {
   AlertTriangle,
   Clock,
   Calendar,
-  Trash2
+  Trash2,
+  NotebookPen
 } from 'lucide-react';
 import type { ProveedorResumen, DeudaResumen } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
@@ -25,6 +26,7 @@ interface Props {
   onOpenAddPayment: (deuda?: DeudaResumen) => void;
   onOpenHistory: () => void;
   onDebtDeleted?: () => void;
+  onOpenEditProvider?: () => void;
 }
 
 export const DebtTable: React.FC<Props> = ({
@@ -33,7 +35,8 @@ export const DebtTable: React.FC<Props> = ({
   onOpenAddDebt,
   onOpenAddPayment,
   onOpenHistory,
-  onDebtDeleted
+  onDebtDeleted,
+  onOpenEditProvider
 }) => {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
   const [deudaToDelete, setDeudaToDelete] = useState<DeudaResumen | null>(null);
@@ -166,11 +169,46 @@ export const DebtTable: React.FC<Props> = ({
         border: '1px solid #e2e8f0',
         boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 16px -4px rgba(15, 23, 42, 0.04)'
       }}>
-        {/* Fila 1: Título a la izquierda y Botones de Acción fijados siempre arriba a la derecha */}
+        {/* Fila 1: Título a la izquierda con botón de editar y Botones de Acción fijados arriba */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
-            {proveedor.nombre}
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
+              {proveedor.nombre}
+            </h1>
+            {onOpenEditProvider && (
+              <button
+                type="button"
+                onClick={onOpenEditProvider}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: '#ecfdf5',
+                  border: '1.5px solid #a7f3d0',
+                  color: '#15803d',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  padding: 0
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = '#d1fae5';
+                  e.currentTarget.style.borderColor = '#6ee7b7';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = '#ecfdf5';
+                  e.currentTarget.style.borderColor = '#a7f3d0';
+                  e.currentTarget.style.transform = 'none';
+                }}
+                title="Editar nombre, contacto y libreta de notas del proveedor"
+              >
+                <NotebookPen size={19} />
+              </button>
+            )}
+          </div>
 
           {/* Botones de acción del proveedor fijados siempre arriba */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
