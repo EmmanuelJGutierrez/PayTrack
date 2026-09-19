@@ -104,6 +104,11 @@ export const App: React.FC = () => {
     }
   }, [selectedProviderId, loadDeudas]);
 
+  const handleSelectMonthYear = (newAnio: number, newMes: number) => {
+    setAnio(newAnio);
+    setMes(newMes);
+  };
+
   const handlePrevMonth = () => {
     if (mes === 1) {
       setMes(12);
@@ -191,6 +196,7 @@ export const App: React.FC = () => {
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenBackup={() => setIsBackupOpen(true)}
         onExportPlanilla={handleExportPlanilla}
+        onSelectMonthYear={handleSelectMonthYear}
       />
 
       {/* Cuerpo Principal (Sidebar + Detalle) */}
@@ -363,6 +369,7 @@ export const App: React.FC = () => {
         onNextMonth={handleNextMonth}
         nombreMes={NOMBRES_MESES[mes - 1]}
         onSelectProveedor={(provId) => setSelectedProviderId(provId)}
+        onSelectMonthYear={handleSelectMonthYear}
       />
 
       <AddProviderModal

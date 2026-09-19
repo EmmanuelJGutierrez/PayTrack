@@ -1,5 +1,7 @@
-﻿import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, BarChart3, HelpCircle, FileSpreadsheet } from 'lucide-react';
+﻿
+import React, { useState } from 'react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, HelpCircle, FileSpreadsheet, ChevronDown } from 'lucide-react';
+import { MonthYearPickerPopover } from '../calendar/MonthYearPickerPopover';
 
 interface Props {
   anio: number;
@@ -11,6 +13,7 @@ interface Props {
   onOpenHelp: () => void;
   onOpenBackup?: () => void;
   onExportPlanilla?: () => void;
+  onSelectMonthYear?: (anio: number, mes: number) => void;
 }
 
 const NOMBRES_MESES = [
@@ -27,8 +30,10 @@ export const Header: React.FC<Props> = ({
   onOpenMonthlySummary,
   onOpenHelp,
   onOpenBackup,
-  onExportPlanilla
+  onExportPlanilla,
+  onSelectMonthYear
 }) => {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const nombreMes = NOMBRES_MESES[mes - 1] || 'Mes';
 
   return (
@@ -47,30 +52,67 @@ export const Header: React.FC<Props> = ({
         boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)'
       }}
     >
-      {/* Selector de Mes con acceso directo al Calendario */}
+      {/* Selector de Mes con acceso directo al Calendario y Navegación rápida */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button
-          onClick={onOpenCalendar}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            backgroundColor: 'transparent',
-            padding: '6px 12px',
-            borderRadius: '10px',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'background-color 0.15s ease'
-          }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          title="Abrir vista de Calendario mensual"
-        >
-          <Calendar size={22} color="#0f5132" />
-          <span style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-            {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
-          </span>
-        </button>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <button
+            type="button"
+            onClick={onOpenCalendar}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              backgroundColor: '#f1f5f9',
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#e2e8f0')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+            title="Abrir vista detallada de Calendario mensual"
+          >
+            <Calendar size={20} color="#0f5132" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsPickerOpen(prev => !prev)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'transparent',
+              padding: '6px 10px',
+              borderRadius: '10px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            title="Seleccionar mes y año rápidamente sin hacer múltiples clics"
+          >
+            <span style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+              {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
+            </span>
+            <ChevronDown size={17} color="#64748b" />
+          </button>
+
+          <MonthYearPickerPopover
+            isOpen={isPickerOpen}
+            onClose={() => setIsPickerOpen(false)}
+            currentAnio={anio}
+            currentMes={mes}
+            onSelect={(newAnio, newMes) => {
+              if (onSelectMonthYear) {
+                onSelectMonthYear(newAnio, newMes);
+              }
+            }}
+          />
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button

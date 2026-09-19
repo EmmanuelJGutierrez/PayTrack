@@ -4,8 +4,9 @@ import { fetchHistorial, anularPago, restaurarDeuda } from '../../services/api';
 import type { MovimientoHistorial } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
 import { exportHistorialProveedorToCsv } from '../../utils/exporter';
-import { FileSpreadsheet, ArrowDownRight, ArrowUpRight, Trash2, RotateCcw, FileText } from 'lucide-react';
+import { FileSpreadsheet, ArrowDownRight, ArrowUpRight, Trash2, RotateCcw, FileText, Calendar, X } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { DateRangeFilterPopover } from '../calendar/DateRangeFilterPopover';
 
 interface Props {
   isOpen: boolean;
@@ -24,13 +25,23 @@ export const HistoryModal: React.FC<Props> = ({
 }) => {
   const [items, setItems] = useState<MovimientoHistorial[]>([]);
   const [filter, setFilter] = useState<'todos' | 'deudas' | 'pagos'>('todos');
+  const [dateStart, setDateStart] = useState<Date | null>(null);
+  const [dateEnd, setDateEnd] = useState<Date | null>(null);
+  const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
 
   const deudasCount = items.filter(m => m.tipoMovimiento === 'Deuda').length;
   const pagosCount = items.filter(m => m.tipoMovimiento === 'Pago').length;
 
+  const hasActiveDateFilter = !!(dateStart || dateEnd);
+
   const filteredItems = items.filter(m => {
-    if (filter === 'deudas') return m.tipoMovimiento === 'Deuda';
-    if (filter === 'pagos') return m.tipoMovimiento === 'Pago';
+    if (filter === 'deudas' && m.tipoMovimiento !== 'Deuda') return false;
+    if (filter === 'pagos' && m.tipoMovimiento !== 'Pago') return false;
+    if (dateStart || dateEnd) {
+      const itemDate = new Date(m.fecha);
+      if (dateStart && itemDate < dateStart) return false;
+      if (dateEnd && itemDate > dateEnd) return false;
+    }
     return true;
   });
   const [loading, setLoading] = useState(false);
@@ -141,60 +152,129 @@ export const HistoryModal: React.FC<Props> = ({
         </button>
       </div>
 
-            {/* Filtros de Navegación Rápida */}
+            {/* Filtros de Navegación Rápida y Rango de Fechas */}
       {!loading && items.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', alignItems: 'center' }}>
-          <button
-            type="button"
-            onClick={() => setFilter('todos')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              border: filter === 'todos' ? '1.5px solid #111827' : '1.5px solid #e5e7eb',
-              backgroundColor: filter === 'todos' ? '#111827' : '#ffffff',
-              color: filter === 'todos' ? '#ffffff' : '#4b5563',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            Todos ({items.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter('deudas')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              border: filter === 'deudas' ? '1.5px solid #dc2626' : '1.5px solid #e5e7eb',
-              backgroundColor: filter === 'deudas' ? '#fee2e2' : '#ffffff',
-              color: filter === 'deudas' ? '#991b1b' : '#4b5563',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            Deudas ({deudasCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter('pagos')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              border: filter === 'pagos' ? '1.5px solid #16a34a' : '1.5px solid #e5e7eb',
-              backgroundColor: filter === 'pagos' ? '#dcfce7' : '#ffffff',
-              color: filter === 'pagos' ? '#166534' : '#4b5563',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            Pagos ({pagosCount})
-          </button>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setFilter('todos')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: filter === 'todos' ? '1.5px solid #111827' : '1.5px solid #e5e7eb',
+                backgroundColor: filter === 'todos' ? '#111827' : '#ffffff',
+                color: filter === 'todos' ? '#ffffff' : '#4b5563',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Todos ({items.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter('deudas')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: filter === 'deudas' ? '1.5px solid #dc2626' : '1.5px solid #e5e7eb',
+                backgroundColor: filter === 'deudas' ? '#fee2e2' : '#ffffff',
+                color: filter === 'deudas' ? '#991b1b' : '#4b5563',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Deudas ({deudasCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter('pagos')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: filter === 'pagos' ? '1.5px solid #16a34a' : '1.5px solid #e5e7eb',
+                backgroundColor: filter === 'pagos' ? '#dcfce7' : '#ffffff',
+                color: filter === 'pagos' ? '#166534' : '#4b5563',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              Pagos ({pagosCount})
+            </button>
+          </div>
+
+          {/* Botón de Filtro por Fechas */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setIsDateFilterOpen(prev => !prev)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: hasActiveDateFilter ? '1.5px solid #15803d' : '1.5px solid #d1d5db',
+                backgroundColor: hasActiveDateFilter ? '#f0fdf4' : '#ffffff',
+                color: hasActiveDateFilter ? '#15803d' : '#4b5563',
+                transition: 'all 0.15s ease',
+                boxShadow: hasActiveDateFilter ? '0 1px 3px rgba(21, 128, 61, 0.15)' : 'none'
+              }}
+              title="Filtrar movimientos por fecha o período"
+            >
+              <Calendar size={14} color={hasActiveDateFilter ? '#15803d' : '#6b7280'} />
+              <span>
+                {hasActiveDateFilter
+                  ? `${dateStart ? dateStart.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) : '...'} - ${dateEnd ? dateEnd.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) : '...'}`
+                  : 'Filtrar por fecha'}
+              </span>
+              {hasActiveDateFilter && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDateStart(null);
+                    setDateEnd(null);
+                  }}
+                  style={{
+                    marginLeft: '2px',
+                    borderRadius: '50%',
+                    padding: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    color: '#dc2626'
+                  }}
+                  title="Quitar filtro de fecha"
+                >
+                  <X size={13} />
+                </span>
+              )}
+            </button>
+
+            <DateRangeFilterPopover
+              isOpen={isDateFilterOpen}
+              onClose={() => setIsDateFilterOpen(false)}
+              startDate={dateStart}
+              endDate={dateEnd}
+              onApply={(s, e) => {
+                setDateStart(s);
+                setDateEnd(e);
+              }}
+              onClear={() => {
+                setDateStart(null);
+                setDateEnd(null);
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -228,7 +308,9 @@ export const HistoryModal: React.FC<Props> = ({
             fontSize: '14px'
           }}
         >
-          No hay {filter === 'deudas' ? 'deudas registradas' : 'pagos registrados'} para este proveedor.
+          {hasActiveDateFilter
+            ? 'No hay movimientos en el rango de fechas seleccionado.'
+            : `No hay ${filter === 'deudas' ? 'deudas registradas' : 'pagos registrados'} para este proveedor.`}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '480px', overflowY: 'auto' }}>

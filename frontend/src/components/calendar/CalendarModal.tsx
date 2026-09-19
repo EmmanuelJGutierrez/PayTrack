@@ -3,7 +3,9 @@ import { ModalWrapper } from '../modals/ModalWrapper';
 import { fetchCalendarioMensual, fetchDetalleDia } from '../../services/api';
 import type { DiaCalendario, DetalleDiaResponse } from '../../types';
 import { ComprobanteBadge } from '../badges/ComprobanteBadge';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, ArrowDownRight, ArrowUpRight, ChevronDown
+} from 'lucide-react';
+import { MonthYearPickerPopover } from './MonthYearPickerPopover';
 
 interface Props {
   isOpen: boolean;
@@ -14,6 +16,7 @@ interface Props {
   onNextMonth: () => void;
   nombreMes: string;
   onSelectProveedor?: (proveedorId: number) => void;
+  onSelectMonthYear?: (anio: number, mes: number) => void;
 }
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -26,8 +29,10 @@ export const CalendarModal: React.FC<Props> = ({
   onPrevMonth,
   onNextMonth,
   nombreMes,
-  onSelectProveedor
+  onSelectProveedor,
+  onSelectMonthYear
 }) => {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [dias, setDias] = useState<DiaCalendario[]>([]);
   const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
   const [detalleDia, setDetalleDia] = useState<DetalleDiaResponse | null>(null);
@@ -200,11 +205,43 @@ export const CalendarModal: React.FC<Props> = ({
             border: '1px solid #e5e7eb'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarIcon size={18} color="#0f5132" />
-            <span style={{ fontSize: '16px', fontWeight: 800, color: '#1f2937' }}>
-              {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
-            </span>
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setIsPickerOpen(prev => !prev)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                borderRadius: '8px',
+                transition: 'background-color 0.15s ease'
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+              title="Seleccionar año y mes directamente"
+            >
+              <CalendarIcon size={18} color="#0f5132" />
+              <span style={{ fontSize: '16px', fontWeight: 800, color: '#1f2937' }}>
+                {nombreMes} <span style={{ color: '#059669' }}>{anio}</span>
+              </span>
+              <ChevronDown size={14} color="#64748b" />
+            </button>
+
+            <MonthYearPickerPopover
+              isOpen={isPickerOpen}
+              onClose={() => setIsPickerOpen(false)}
+              currentAnio={anio}
+              currentMes={mes}
+              onSelect={(newAnio, newMes) => {
+                if (onSelectMonthYear) {
+                  onSelectMonthYear(newAnio, newMes);
+                }
+              }}
+            />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
